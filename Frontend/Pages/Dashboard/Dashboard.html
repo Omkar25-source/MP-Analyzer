@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudySync - Dashboard</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <a href="../../index.html" class="sidebar-brand">
+                <div class="icon-container">
+                    <i data-lucide="layout-dashboard"></i>
+                </div>
+                <div>
+                    <div style="line-height: 1.2; color: var(--text-dark);">StudySync</div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: normal;">Performance Tracker
+                    </div>
+                </div>
+            </a>
+
+            <nav class="sidebar-nav">
+                <!-- Active link for Dashboard -->
+                <a href="dashboard.html" class="nav-item active">
+                    <i data-lucide="layout-grid"></i> Dashboard
+                </a>
+                <!-- Links to other pages based on your folder structure -->
+                <a href="../study-planner/study-planner.html" class="nav-item">
+                    <i data-lucide="book-open"></i> Study Planner
+                </a>
+                <a href="../goals/goals.html" class="nav-item">
+                    <i data-lucide="target"></i> Goals
+                </a>
+                <a href="../attendance/attendance.html" class="nav-item">
+                    <i data-lucide="calendar-check"></i> Attendance
+                </a>
+                <a href="../alerts/alerts.html" class="nav-item">
+                    <i data-lucide="bell"></i> Alerts
+                    <span class="badge bg-danger rounded-pill ms-auto" id="alert-badge">0</span>
+                </a>
+                <a href="../Weekly reviews/weekly-review.html" class="nav-item">
+                    <i data-lucide="clipboard-list"></i> Weekly Review
+                </a>
+                <a href="../Analytics/analytics.html" class="nav-item">
+                    <i data-lucide="bar-chart-2"></i> Analytics
+                </a>
+                <a href="../Achievements/achievements.html" class="nav-item">
+                    <i data-lucide="award"></i> Achievements
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar" id="user-initials">S</div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.9rem;" id="user-name-display">Student</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);" id="user-meta">Semester 1, CSE</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Mobile Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4 mobile-toggle">
+                <button class="btn btn-light border"
+                    onclick="document.getElementById('sidebar').classList.toggle('show')">
+                    <i data-lucide="menu"></i>
+                </button>
+                <h5 class="m-0 font-weight-bold">StudySync Dashboard</h5>
+            </div>
+
+            <!-- DASHBOARD CONTENT -->
+            <div id="dashboard">
+                <div class="mb-4">
+                    <h2 class="fw-bold">Welcome back, <span id="welcome-name">Arjun</span>! 👋</h2>
+                    <p class="text-muted">Here's your personalized insight summary for today based on your entries.</p>
+                </div>
+
+                <!-- Global Alert Container -->
+                <div id="alertsContainer"></div>
+
+                <!-- Quick Actions -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <div class="custom-card action-card purple" data-bs-toggle="modal"
+                            data-bs-target="#logStudyModal">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="icon-box purple"><i data-lucide="plus"></i></div>
+                                <i data-lucide="arrow-right" class="text-muted"></i>
+                            </div>
+                            <h5 class="fw-bold mb-1">Log Today's Study</h5>
+                            <p class="text-muted small m-0">Quick entry • Takes 1 min</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="custom-card action-card green" data-bs-toggle="modal"
+                            data-bs-target="#logAttendanceModal">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="icon-box green"><i data-lucide="calendar-plus"></i></div>
+                                <i data-lucide="arrow-right" class="text-muted"></i>
+                            </div>
+                            <h5 class="fw-bold mb-1">Update Attendance</h5>
+                            <p class="text-muted small m-0">Auto-calculated insights</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="../goals/goals.html" class="text-decoration-none">
+                            <div class="custom-card action-card pink">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="icon-box pink"><i data-lucide="trophy"></i></div>
+                                    <i data-lucide="arrow-right" class="text-muted"></i>
+                                </div>
+                                <h5 class="fw-bold mb-1">Set New Goals</h5>
+                                <p class="text-muted small m-0">Track your objectives</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Stats Row -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-3 col-sm-6">
+                        <div class="custom-card">
+                            <div class="d-flex justify-content-between">
+                                <div class="icon-box purple mb-2" style="width:36px; height:36px;"><i
+                                        data-lucide="trending-up" size="18"></i></div>
+                            </div>
+                            <div class="stat-label">Overall Performance</div>
+                            <div class="stat-value" id="stat-performance">0%</div>
+                            <div class="progress-slim">
+                                <div class="progress-bar" id="bar-performance" role="progressbar" style="width: 0%">
+                                </div>
+                            </div>
+                            <div class="text-muted small mt-2"><i data-lucide="bar-chart-2" size="12"></i> System
+                                calculated</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <div class="custom-card">
+                            <div class="d-flex justify-content-between">
+                                <div class="icon-box green mb-2" style="width:36px; height:36px;"><i data-lucide="clock"
+                                        size="18"></i></div>
+                                <span class="text-muted small">Today</span>
+                            </div>
+                            <div class="stat-label">Study Hours</div>
+                            <div class="stat-value"><span id="stat-hours">0</span><span
+                                    class="fs-5 text-muted">/8h</span></div>
+                            <div class="text-success small fw-bold mt-2" id="stat-hours-msg">Log hours to start</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <div class="custom-card">
+                            <div class="d-flex justify-content-between">
+                                <div class="icon-box green mb-2" style="width:36px; height:36px;"><i
+                                        data-lucide="calendar" size="18"></i></div>
+                                <span class="badge-custom badge-success" id="attendance-status">No Data</span>
+                            </div>
+                            <div class="stat-label">Overall Attendance</div>
+                            <div class="stat-value" id="stat-attendance">0%</div>
+                            <div class="text-muted small mt-2"><i data-lucide="calculator" size="12"></i>
+                                Auto-calculated</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <div class="custom-card">
+                            <div class="d-flex justify-content-between">
+                                <div class="icon-box orange mb-2" style="width:36px; height:36px;"><i
+                                        data-lucide="flame" size="18"></i></div>
+                            </div>
+                            <div class="stat-label">Study Streak</div>
+                            <div class="stat-value" id="stat-streak">0 days</div>
+                            <div class="text-warning small mt-2 fw-bold">Start studying!</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="row g-4">
+                    <div class="col-md-8">
+                        <div class="custom-card">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <h5 class="fw-bold mb-0">Weekly Study Hours</h5>
+                                    <p class="text-muted small m-0">Analyzed from your logs</p>
+                                </div>
+                                <i data-lucide="clock" class="text-primary"></i>
+                            </div>
+                            <canvas id="weeklyStudyChart" height="100"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="custom-card">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <h5 class="fw-bold mb-0">Subject Focus</h5>
+                                    <p class="text-muted small m-0">Based on time logged</p>
+                                </div>
+                                <i data-lucide="book-open" class="text-success"></i>
+                            </div>
+                            <canvas id="subjectPieChart" height="200"></canvas>
+                            <div id="no-chart-data" class="empty-state" style="display:none;">
+                                <i data-lucide="inbox" size="32" class="mb-2"></i>
+                                <p>No study logs yet.<br>Log study time to see chart.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODALS FOR DATA ENTRY -->
+    <!-- Log Study Modal -->
+    <div class="modal fade" id="logStudyModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Log Study Session</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="logStudyForm">
+                        <div class="mb-3">
+                            <label class="form-label">Subject</label>
+                            <select class="form-select" id="logSubject" required>
+                                <option value="Computer Science">Computer Science</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Hours Studied</label>
+                            <input type="number" class="form-control" id="logHours" min="0.5" max="12" step="0.5"
+                                required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Date</label>
+                            <input type="date" class="form-control" id="logDate" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2 rounded-3">Save Log</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Log Attendance Modal -->
+    <div class="modal fade" id="logAttendanceModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Update Attendance</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="attendanceForm">
+                        <div class="mb-3">
+                            <label class="form-label">Date</label>
+                            <input type="date" class="form-control" id="attDate" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Status</label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="attStatus" id="statusPresent"
+                                        value="present" checked>
+                                    <label class="form-check-label text-success fw-bold"
+                                        for="statusPresent">Present</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="attStatus" id="statusAbsent"
+                                        value="absent">
+                                    <label class="form-check-label text-danger fw-bold"
+                                        for="statusAbsent">Absent</label>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 py-2 rounded-3">Record Attendance</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Theme (dark mode) -->
+    <script src="../../assets/js/theme.js"></script>
+    <!-- Shared Store (must load first) -->
+    <script src="../../assets/js/store.js"></script>
+    <!-- Dashboard JS -->
+    <script src="../../assets/js/Dashboard.js"></script>
+    <!-- Export Utilities -->
+    <script src="../../assets/js/export.js"></script>
+    <!-- Pomodoro Timer Widget -->
+    <script src="../../assets/js/pomodoro.js"></script>
+</body>
+
+</html>

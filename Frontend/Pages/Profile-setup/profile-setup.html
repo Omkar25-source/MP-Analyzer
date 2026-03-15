@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudySync - Profile Setup</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-color: #f1f5f9;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        body, html {
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Animated Background — matches login page */
+        .bg-shapes { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; background: #f8fafc; }
+        .shape     { position: absolute; filter: blur(80px); opacity: 0.6; animation: float 10s infinite ease-in-out alternate; }
+        .shape-1   { top: -10%; left: -10%; width: 500px; height: 500px; background: #e0e7ff; border-radius: 50%; }
+        .shape-2   { bottom: -10%; right: -10%; width: 600px; height: 600px; background: #d1fae5; border-radius: 50%; animation-delay: -5s; }
+        .shape-3   { top: 40%; left: 60%; width: 400px; height: 400px; background: #fef3c7; border-radius: 50%; animation-delay: -2s; }
+
+        @keyframes float {
+            0%   { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, -50px) scale(1.1); }
+        }
+
+        .setup-wrapper {
+            position: relative;
+            z-index: 1;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        /* Glassmorphism card — matches login page */
+        .setup-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 520px;
+            padding: 3rem 2.5rem;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0);    }
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .brand-icon {
+            background: var(--primary-color);
+            color: white;
+            padding: 10px;
+            border-radius: 12px;
+            display: flex;
+        }
+
+        .setup-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .form-floating > .form-control,
+        .form-control,
+        .form-select {
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 0.875rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -5px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Subject tags */
+        .subject-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .subject-tag {
+            background: #e0e7ff;
+            color: #4f46e5;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .subject-tag .remove-tag {
+            cursor: pointer;
+            font-weight: 700;
+            opacity: 0.6;
+            transition: opacity 0.15s;
+        }
+
+        .subject-tag .remove-tag:hover { opacity: 1; }
+
+        .add-subject-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .add-subject-row input {
+            flex: 1;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .add-subject-row button {
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .step-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Animated Background -->
+    <div class="bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <div class="setup-wrapper">
+        <div class="setup-card">
+            <div class="brand-logo">
+                <div class="brand-icon">
+                    <i data-lucide="layout-dashboard" size="24"></i>
+                </div>
+                StudySync
+            </div>
+            <p class="setup-subtitle">Let's set up your profile before we begin.</p>
+            <div class="step-label">Step 1 of 1 — Profile Setup</div>
+
+            <form id="profileForm" novalidate>
+
+                <!-- Name -->
+                <div class="mb-3">
+                    <label class="form-label fw-medium" for="profileName">Full Name</label>
+                    <input type="text" class="form-control" id="profileName" placeholder="e.g. Arjun Singh" required maxlength="80">
+                    <div class="invalid-feedback">Please enter your name.</div>
+                </div>
+
+                <!-- Semester & Branch -->
+                <div class="row mb-3 g-3">
+                    <div class="col-6">
+                        <label class="form-label fw-medium" for="profileSemester">Semester</label>
+                        <select class="form-select" id="profileSemester" required>
+                            <option value="" disabled selected>Select…</option>
+                            <option value="1">1st Semester</option>
+                            <option value="2">2nd Semester</option>
+                            <option value="3">3rd Semester</option>
+                            <option value="4">4th Semester</option>
+                            <option value="5">5th Semester</option>
+                            <option value="6">6th Semester</option>
+                            <option value="7">7th Semester</option>
+                            <option value="8">8th Semester</option>
+                        </select>
+                        <div class="invalid-feedback">Please select a semester.</div>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-medium" for="profileBranch">Branch / Major</label>
+                        <input type="text" class="form-control" id="profileBranch" placeholder="e.g. CSE" required maxlength="50">
+                        <div class="invalid-feedback">Please enter your branch.</div>
+                    </div>
+                </div>
+
+                <!-- Daily Study Target -->
+                <div class="mb-3">
+                    <label class="form-label fw-medium" for="profileTarget">
+                        Daily Study Target
+                        <span class="text-muted fw-normal">(hours)</span>
+                    </label>
+                    <input type="number" class="form-control" id="profileTarget" min="1" max="20" step="0.5" value="8" required>
+                    <div class="form-text">How many hours do you aim to study per day?</div>
+                    <div class="invalid-feedback">Enter a value between 1 and 20.</div>
+                </div>
+
+                <!-- Subjects -->
+                <div class="mb-4">
+                    <label class="form-label fw-medium">Your Subjects</label>
+                    <div class="form-text mb-2">Add the subjects you study — these will populate all dropdowns.</div>
+                    <div class="subject-tags" id="subjectTags"></div>
+                    <div class="add-subject-row">
+                        <input type="text" id="newSubjectInput" placeholder="Add a subject…" maxlength="60">
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="addSubjectBtn">
+                            <i data-lucide="plus" size="14"></i> Add
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="btn btn-primary w-100" id="submitBtn">
+                    <i data-lucide="arrow-right" size="18" class="me-2"></i>
+                    Save & Go to Dashboard
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Store (must load before profile logic) -->
+    <script src="../../assets/js/store.js"></script>
+
+    <script>
+        lucide.createIcons();
+
+        /* ── Default subjects ── */
+        let subjects = ['Computer Science', 'Mathematics', 'Physics', 'General'];
+
+        /* ── Pre-fill form if user profile already exists ── */
+        (function prefill() {
+            const user = Store.getUser();
+            if (user && user.name && user.name !== 'Student') {
+                document.getElementById('profileName').value     = user.name;
+                document.getElementById('profileSemester').value = user.semester;
+                document.getElementById('profileBranch').value   = user.branch;
+                document.getElementById('profileTarget').value   = user.targetHours;
+                if (user.subjects && user.subjects.length > 0) {
+                    subjects = [...user.subjects];
+                }
+            }
+            renderTags();
+        })();
+
+        /* ── Render subject tags ── */
+        function renderTags() {
+            const container = document.getElementById('subjectTags');
+            if (subjects.length === 0) {
+                container.innerHTML = '<span class="text-muted small">No subjects added yet.</span>';
+                return;
+            }
+            container.innerHTML = subjects.map((s, i) => `
+                <span class="subject-tag">
+                    ${escapeHtml(s)}
+                    <span class="remove-tag" data-index="${i}" title="Remove">×</span>
+                </span>
+            `).join('');
+
+            container.querySelectorAll('.remove-tag').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    subjects.splice(parseInt(this.dataset.index), 1);
+                    renderTags();
+                });
+            });
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        /* ── Add subject ── */
+        function addSubject() {
+            const input = document.getElementById('newSubjectInput');
+            const val   = input.value.trim();
+            if (!val) return;
+            if (subjects.includes(val)) {
+                input.value = '';
+                return;
+            }
+            subjects.push(val);
+            input.value = '';
+            renderTags();
+        }
+
+        document.getElementById('addSubjectBtn').addEventListener('click', addSubject);
+        document.getElementById('newSubjectInput').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); addSubject(); }
+        });
+
+        /* ── Form submit ── */
+        document.getElementById('profileForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const name     = document.getElementById('profileName').value.trim();
+            const semester = parseInt(document.getElementById('profileSemester').value);
+            const branch   = document.getElementById('profileBranch').value.trim();
+            const target   = parseFloat(document.getElementById('profileTarget').value);
+
+            // Basic validation
+            let valid = true;
+            if (!name)     { document.getElementById('profileName').classList.add('is-invalid');     valid = false; } 
+            else             document.getElementById('profileName').classList.remove('is-invalid');
+
+            if (!semester) { document.getElementById('profileSemester').classList.add('is-invalid'); valid = false; }
+            else             document.getElementById('profileSemester').classList.remove('is-invalid');
+
+            if (!branch)   { document.getElementById('profileBranch').classList.add('is-invalid');   valid = false; }
+            else             document.getElementById('profileBranch').classList.remove('is-invalid');
+
+            if (!valid) return;
+
+            if (subjects.length === 0) {
+                subjects = ['Computer Science', 'Mathematics', 'Physics', 'General'];
+            }
+
+            Store.saveUser({
+                name,
+                semester,
+                branch,
+                targetHours  : isNaN(target) ? 8 : target,
+                subjects,
+            });
+
+            // Redirect to dashboard
+            window.location.href = '../Dashboard/Dashboard.html';
+        });
+    </script>
+</body>
+
+</html>

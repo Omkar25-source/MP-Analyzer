@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudySync - Goals</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar (unchanged) -->
+        <aside class="sidebar" id="sidebar">
+            <!-- Same sidebar content as before -->
+            <a href="../../index.html" class="sidebar-brand">
+                <div class="icon-container">
+                    <i data-lucide="layout-dashboard"></i>
+                </div>
+                <div>
+                    <div style="line-height: 1.2; color: var(--text-dark);">StudySync</div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: normal;">Performance Tracker
+                    </div>
+                </div>
+            </a>
+            <nav class="sidebar-nav">
+                <a href="../dashboard/dashboard.html" class="nav-item"><i data-lucide="layout-grid"></i> Dashboard</a>
+                <a href="../study-planner/study-planner.html" class="nav-item"><i data-lucide="book-open"></i> Study
+                    Planner</a>
+                <a href="goals.html" class="nav-item active"><i data-lucide="target"></i> Goals</a>
+                <a href="../attendance/attendance.html" class="nav-item"><i data-lucide="calendar-check"></i>
+                    Attendance</a>
+                <a href="../alerts/alerts.html" class="nav-item">
+                    <i data-lucide="bell"></i> Alerts
+                    <span class="badge bg-danger rounded-pill ms-auto" id="alert-badge">0</span>
+                </a>
+                <a href="../Weekly reviews/weekly-review.html" class="nav-item">
+                    <i data-lucide="clipboard-list"></i> Weekly Review
+                </a>
+                <a href="../Analytics/analytics.html" class="nav-item">
+                    <i data-lucide="bar-chart-2"></i> Analytics
+                </a>
+                <a href="../Achievements/achievements.html" class="nav-item">
+                    <i data-lucide="award"></i> Achievements
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar" id="user-initials">S</div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.9rem;" id="user-name-display">Student</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);" id="user-meta">Semester 1, CSE</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- FIXED: No onclick here -->
+            <header class="top-header">
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-light border mobile-toggle-btn" data-action="toggle-sidebar">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div>
+                        <h4 class="m-0 fw-bold d-flex align-items-center gap-2">
+                            <i data-lucide="target" class="text-primary"></i> My Goals
+                        </h4>
+                        <span class="text-muted small">Track your long-term milestones</span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary d-flex align-items-center gap-2 fw-bold shadow-sm"
+                        data-bs-toggle="modal" data-bs-target="#newGoalModal">
+                        <i data-lucide="plus"></i> New Goal
+                    </button>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <!-- Quick Stats -->
+                <div class="row g-4 mb-4" id="goalStats">
+                    <div class="col-md-4">
+                        <div class="custom-card py-3 d-flex align-items-center gap-3">
+                            <div class="p-3 bg-primary bg-opacity-10 text-primary rounded-circle">
+                                <i data-lucide="flag"></i>
+                            </div>
+                            <div>
+                                <h3 class="m-0 fw-bold" id="totalGoalsStat">0</h3>
+                                <span class="text-muted small">Active Goals</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="custom-card py-3 d-flex align-items-center gap-3">
+                            <div class="p-3 bg-success bg-opacity-10 text-success rounded-circle">
+                                <i data-lucide="award"></i>
+                            </div>
+                            <div>
+                                <h3 class="m-0 fw-bold" id="completedGoalsStat">0</h3>
+                                <span class="text-muted small">Completed</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="custom-card py-3 d-flex align-items-center gap-3">
+                            <div class="p-3 bg-warning bg-opacity-10 text-warning rounded-circle">
+                                <i data-lucide="zap"></i>
+                            </div>
+                            <div>
+                                <h3 class="m-0 fw-bold" id="avgProgressStat">0%</h3>
+                                <span class="text-muted small">Average Progress</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Goals Grid -->
+                <div class="row g-4" id="goalsGrid">
+                    <div class="col-12" id="emptyStateContainer">
+                        <div class="empty-state">
+                            <div class="mb-4">
+                                <i data-lucide="rocket" size="64" class="text-primary opacity-50"></i>
+                            </div>
+                            <h4 class="fw-bold">Ready to aim higher?</h4>
+                            <p class="text-muted mb-4 max-w-md mx-auto">Set specific, measurable goals to keep yourself
+                                motivated.</p>
+                            <button class="btn btn-primary px-4 py-2 fw-bold" data-bs-toggle="modal"
+                                data-bs-target="#newGoalModal">
+                                Create Your First Goal
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- FIXED: No onclick in modals -->
+    <!-- New Goal Modal -->
+    <div class="modal fade" id="newGoalModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Create New Goal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="goalForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Goal Title</label>
+                            <input type="text" class="form-control" id="goalTitle" required
+                                placeholder="e.g. Master React.js">
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="form-label fw-medium">Category</label>
+                                <select class="form-select" id="goalCategory">
+                                    <option value="academics">Academics</option>
+                                    <option value="skills">Skills</option>
+                                    <option value="projects">Projects</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-medium">Deadline</label>
+                                <input type="date" class="form-control" id="goalDeadline" required>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-medium">Target Metric</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="goalTarget" required min="1"
+                                    placeholder="e.g. 100">
+                                <span class="input-group-text bg-light">Units</span>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2 rounded-3 fw-bold">Set Goal</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Progress Modal -->
+    <div class="modal fade" id="updateProgressModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content border-0 rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Update Progress</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="updateProgressForm">
+                        <input type="hidden" id="updateGoalId">
+                        <div class="mb-4">
+                            <label class="form-label text-muted small" id="updateGoalLabel">Add completed units</label>
+                            <div class="input-group">
+                                <!-- FIXED: data-adjust instead of onclick -->
+                                <button class="btn btn-outline-secondary progress-adjust-btn" type="button"
+                                    data-adjust="-1">-</button>
+                                <input type="number" class="form-control text-center fw-bold" id="updateAmount"
+                                    value="1" min="1">
+                                <button class="btn btn-outline-secondary progress-adjust-btn" type="button"
+                                    data-adjust="1">+</button>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 fw-bold">Save Progress</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Theme (dark mode) -->
+    <script src="../../assets/js/theme.js"></script>
+    <script src="../../assets/js/store.js"></script>
+    <script src="../../assets/js/Goals.js"></script>
+    <!-- Pomodoro Timer Widget -->
+    <script src="../../assets/js/pomodoro.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudySync - Alerts</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <a href="../../index.html" class="sidebar-brand">
+                <div class="icon-container">
+                    <i data-lucide="layout-dashboard"></i>
+                </div>
+                <div>
+                    <div style="line-height: 1.2; color: var(--text-dark);">StudySync</div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: normal;">Performance Tracker
+                    </div>
+                </div>
+            </a>
+            <nav class="sidebar-nav">
+                <a href="../dashboard/dashboard.html" class="nav-item"><i data-lucide="layout-grid"></i> Dashboard</a>
+                <a href="../study-planner/study-planner.html" class="nav-item"><i data-lucide="book-open"></i> Study
+                    Planner</a>
+                <a href="../goals/goals.html" class="nav-item"><i data-lucide="target"></i> Goals</a>
+                <a href="../attendance/attendance.html" class="nav-item"><i data-lucide="calendar-check"></i>
+                    Attendance</a>
+                <a href="alerts.html" class="nav-item active">
+                    <i data-lucide="bell"></i> Alerts
+                    <span class="badge bg-danger rounded-pill ms-auto" id="alert-badge">0</span>
+                </a>
+                <a href="../Weekly reviews/weekly-review.html" class="nav-item">
+                    <i data-lucide="clipboard-list"></i> Weekly Review
+                </a>
+                <a href="../Analytics/analytics.html" class="nav-item">
+                    <i data-lucide="bar-chart-2"></i> Analytics
+                </a>
+                <a href="../Achievements/achievements.html" class="nav-item">
+                    <i data-lucide="award"></i> Achievements
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar" id="user-initials">S</div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.9rem;" id="user-name-display">Student</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);" id="user-meta">Semester 1, CSE</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- FIXED: No onclick -->
+            <header class="top-header">
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-light border mobile-toggle-btn" data-action="toggle-sidebar">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div>
+                        <h4 class="m-0 fw-bold d-flex align-items-center gap-2">
+                            <i data-lucide="bell-ring" class="text-primary"></i> Notifications
+                        </h4>
+                        <span class="text-muted small">Stay on top of your tasks and updates</span>
+                    </div>
+                </div>
+                <div class="header-actions d-flex gap-2">
+                    <!-- FIXED: No onclick -->
+                    <button class="btn btn-light border d-flex align-items-center gap-2 shadow-sm mark-all-read-btn">
+                        <i data-lucide="check-circle-2" size="18"></i> <span class="d-none d-sm-inline">Mark All
+                            Read</span>
+                    </button>
+                    <button class="btn btn-primary d-flex align-items-center gap-2 fw-bold shadow-sm"
+                        data-bs-toggle="modal" data-bs-target="#newReminderModal">
+                        <i data-lucide="plus"></i> <span class="d-none d-sm-inline">New Reminder</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <!-- FIXED: No onclick tabs -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <ul class="nav nav-pills" id="alertTabs">
+                        <li class="nav-item">
+                            <button
+                                class="nav-link active bg-light text-dark fw-medium border shadow-sm px-4 filter-tab-btn"
+                                data-filter="all" id="tab-all">All</button>
+                        </li>
+                        <li class="nav-item ms-2">
+                            <button class="nav-link text-muted fw-medium px-4 filter-tab-btn" data-filter="unread"
+                                id="tab-unread">Unread</button>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Alerts List Container -->
+                <div id="alertsListContainer">
+                    <!-- Alerts will be injected here via JS -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyStateContainer" class="empty-state" style="display: none;">
+                    <div class="mb-4">
+                        <i data-lucide="bell-off" size="64" class="text-muted opacity-50"></i>
+                    </div>
+                    <h4 class="fw-bold">You're all caught up!</h4>
+                    <p class="text-muted mb-4">You have no new notifications or reminders at the moment.</p>
+                    <button class="btn btn-outline-primary px-4 fw-bold" data-bs-toggle="modal"
+                        data-bs-target="#newReminderModal">
+                        Set a Custom Reminder
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- New Reminder Modal -->
+    <div class="modal fade" id="newReminderModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Create Custom Reminder</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="reminderForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Reminder Title</label>
+                            <input type="text" class="form-control" id="remTitle" required
+                                placeholder="e.g. Submit OS Assignment">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Description (Optional)</label>
+                            <textarea class="form-control" id="remDesc" rows="2"
+                                placeholder="Add extra details..."></textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-medium">Type</label>
+                            <select class="form-select" id="remType">
+                                <option value="reminder">Standard Reminder</option>
+                                <option value="urgent">Urgent Deadline</option>
+                                <option value="system">General Info</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2 rounded-3 fw-bold">Add Reminder</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Theme (dark mode) -->
+    <script src="../../assets/js/theme.js"></script>
+    <script src="../../assets/js/store.js"></script>
+    <script src="../../assets/js/Alerts.js"></script>
+    <!-- Pomodoro Timer Widget -->
+    <script src="../../assets/js/pomodoro.js"></script>
+</body>
+
+</html>
