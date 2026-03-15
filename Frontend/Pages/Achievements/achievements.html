@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudySync - Achievements</title>
+    <meta name="description" content="Your StudySync achievement badges — milestones earned through consistent study habits.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+
+    <style>
+        /* Badge cards */
+        .badge-card {
+            border-radius: 16px;
+            border: 2px solid #e2e8f0;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            transition: all 0.25s ease;
+            background: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+        .badge-card:hover { transform: translateY(-3px); }
+        .badge-card.earned {
+            border-color: transparent;
+            box-shadow: 0 0 0 2px #c7d2fe, 0 8px 20px -6px rgba(99,102,241,0.25);
+            background: linear-gradient(135deg, #fafffe 0%, #f5f3ff 100%);
+        }
+        .badge-card.locked {
+            opacity: 0.55;
+            filter: grayscale(0.8);
+        }
+        .badge-card.locked:hover { opacity: 0.75; }
+
+        .badge-emoji {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            display: block;
+            line-height: 1;
+        }
+        .badge-name {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+        .badge-desc {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+        .badge-earned-tag {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #10b981;
+            color: white;
+            font-size: 0.6rem;
+            font-weight: 700;
+            border-radius: 20px;
+            padding: 2px 7px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Progress mini-bar inside badge card */
+        .badge-progress-wrap {
+            margin-top: 10px;
+        }
+        .badge-progress-track {
+            height: 5px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .badge-progress-fill {
+            height: 100%;
+            background: #6366f1;
+            border-radius: 3px;
+            transition: width 0.5s;
+        }
+        .badge-progress-label {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Summary bar */
+        .achievements-summary {
+            background: linear-gradient(135deg, #6366f1, #818cf8);
+            border-radius: 16px;
+            color: white;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+        }
+        .achievements-summary h3 { color: white; font-weight: 800; }
+        .big-pct {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        /* Category filter tabs */
+        .cat-tab {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .cat-tab.active, .cat-tab:hover {
+            background: #e0e7ff;
+            border-color: #c7d2fe;
+            color: #4338ca;
+        }
+
+        /* Dark mode */
+        body.dark-mode .badge-card           { background: #1e293b; border-color: #334155; }
+        body.dark-mode .badge-card.earned    { background: linear-gradient(135deg, #1e293b 0%, #1e1b4b 100%); }
+        body.dark-mode .badge-progress-track{ background: #334155; }
+        body.dark-mode .cat-tab              { background: #1e293b; border-color: #334155; color: #94a3b8; }
+        body.dark-mode .cat-tab.active,
+        body.dark-mode .cat-tab:hover        { background: #312e81; border-color: #4f46e5; color: #a5b4fc; }
+    </style>
+</head>
+
+<body>
+<div class="app-container">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <a href="../../index.html" class="sidebar-brand">
+            <div class="icon-container"><i data-lucide="layout-dashboard"></i></div>
+            <div>
+                <div style="line-height:1.2;color:var(--text-dark)">StudySync</div>
+                <div style="font-size:0.7rem;color:var(--text-muted);font-weight:normal">Performance Tracker</div>
+            </div>
+        </a>
+        <nav class="sidebar-nav">
+            <a href="../Dashboard/Dashboard.html"           class="nav-item"><i data-lucide="layout-grid"></i> Dashboard</a>
+            <a href="../Study-Planner/Study-Planner.html"   class="nav-item"><i data-lucide="book-open"></i> Study Planner</a>
+            <a href="../Goals/Goals.html"                   class="nav-item"><i data-lucide="target"></i> Goals</a>
+            <a href="../attendance/attendance.html"         class="nav-item"><i data-lucide="calendar-check"></i> Attendance</a>
+            <a href="../Alerts/Alerts.html"                 class="nav-item">
+                <i data-lucide="bell"></i> Alerts
+                <span class="badge bg-danger rounded-pill ms-auto" id="alert-badge" style="display:none">0</span>
+            </a>
+            <a href="../Weekly reviews/weekly-review.html"  class="nav-item"><i data-lucide="clipboard-list"></i> Weekly Review</a>
+            <a href="../Analytics/analytics.html"           class="nav-item"><i data-lucide="bar-chart-2"></i> Analytics</a>
+            <a href="achievements.html"                     class="nav-item active"><i data-lucide="award"></i> Achievements</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="avatar" id="user-initials">S</div>
+                <div>
+                    <div style="font-weight:600;font-size:0.9rem" id="user-name-display">Student</div>
+                    <div style="font-size:0.75rem;color:var(--text-muted)" id="user-meta">Semester 1, CSE</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4 mobile-toggle">
+            <button class="btn btn-light border" onclick="document.getElementById('sidebar').classList.toggle('show')">
+                <i data-lucide="menu"></i>
+            </button>
+            <h5 class="m-0 fw-bold">Achievements</h5>
+        </div>
+
+        <div class="mb-4">
+            <h2 class="fw-bold mb-1">Achievements 🏆</h2>
+            <p class="text-muted mb-0">Milestones earned through your study habits.</p>
+        </div>
+
+        <!-- Summary banner -->
+        <div class="achievements-summary">
+            <div class="row align-items-center g-4">
+                <div class="col-auto">
+                    <div class="big-pct" id="earnedPct">0%</div>
+                    <div style="opacity:0.85; font-size:0.85rem; margin-top:4px">Unlocked</div>
+                </div>
+                <div class="col">
+                    <h4 class="fw-bold mb-1" id="earnedTitle">Keep going!</h4>
+                    <p class="mb-2" style="opacity:0.85; font-size:0.88rem" id="earnedSubtitle">Complete more activities to earn badges.</p>
+                    <div style="height:8px; background:rgba(255,255,255,0.25); border-radius:4px; overflow:hidden">
+                        <div id="earnedBar" style="height:100%; background:white; border-radius:4px; width:0%; transition:width 0.8s ease"></div>
+                    </div>
+                </div>
+                <div class="col-auto text-center" style="opacity:0.9">
+                    <div style="font-size:2rem; font-weight:800" id="earnedCount">0</div>
+                    <div style="font-size:0.75rem">of <span id="totalCount">0</span> badges</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category filter -->
+        <div class="d-flex gap-2 flex-wrap mb-4" id="catTabs">
+            <button class="cat-tab active" data-cat="all">All</button>
+            <button class="cat-tab" data-cat="study">📚 Study</button>
+            <button class="cat-tab" data-cat="consistency">🔥 Consistency</button>
+            <button class="cat-tab" data-cat="goals">🎯 Goals</button>
+            <button class="cat-tab" data-cat="attendance">📅 Attendance</button>
+            <button class="cat-tab" data-cat="tasks">✅ Tasks</button>
+        </div>
+
+        <!-- Badge grid -->
+        <div class="row g-3" id="badgeGrid"></div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../../assets/js/store.js"></script>
+<script src="../../assets/js/theme.js"></script>
+
+<script>
+/* ── Achievement definitions ──────────────────────────────────────
+   Each badge has:
+     id, emoji, name, desc, category
+     check(stats) → { earned: bool, progress: number (0-1), label: string }
+───────────────────────────────────────────────────────────────── */
+const BADGES = [
+    // ── Study ─────────────────────────────────────────────────── //
+    {
+        id: 'first_session', emoji: '📖', name: 'First Step', category: 'study',
+        desc: 'Log your very first study session.',
+        check: s => ({ earned: s.totalSessions >= 1, progress: Math.min(1, s.totalSessions), label: `${s.totalSessions}/1 session` }),
+    },
+    {
+        id: 'five_sessions', emoji: '📚', name: 'Early Bird', category: 'study',
+        desc: 'Log 5 study sessions.',
+        check: s => ({ earned: s.totalSessions >= 5, progress: Math.min(1, s.totalSessions / 5), label: `${s.totalSessions}/5 sessions` }),
+    },
+    {
+        id: 'fifty_hours', emoji: '⏱️', name: 'Dedicated', category: 'study',
+        desc: 'Accumulate 50 total study hours.',
+        check: s => ({ earned: s.totalHours >= 50, progress: Math.min(1, s.totalHours / 50), label: `${s.totalHours.toFixed(1)}/50h` }),
+    },
+    {
+        id: 'century_hours', emoji: '💯', name: 'Century Club', category: 'study',
+        desc: 'Accumulate 100 total study hours.',
+        check: s => ({ earned: s.totalHours >= 100, progress: Math.min(1, s.totalHours / 100), label: `${s.totalHours.toFixed(1)}/100h` }),
+    },
+    {
+        id: 'multi_subject', emoji: '🌐', name: 'Subject Explorer', category: 'study',
+        desc: 'Study at least 3 different subjects.',
+        check: s => ({ earned: s.uniqueSubjects >= 3, progress: Math.min(1, s.uniqueSubjects / 3), label: `${s.uniqueSubjects}/3 subjects` }),
+    },
+    {
+        id: 'pomodoro_start', emoji: '🍅', name: 'Pomodoro Starter', category: 'study',
+        desc: 'Complete your first Pomodoro session.',
+        check: s => ({ earned: s.pomodoros >= 1, progress: Math.min(1, s.pomodoros), label: `${s.pomodoros}/1 pomodoro` }),
+    },
+    {
+        id: 'pomodoro_pro', emoji: '🔴', name: 'Pomodoro Pro', category: 'study',
+        desc: 'Complete 10 Pomodoro sessions.',
+        check: s => ({ earned: s.pomodoros >= 10, progress: Math.min(1, s.pomodoros / 10), label: `${s.pomodoros}/10 pomodoros` }),
+    },
+
+    // ── Consistency ───────────────────────────────────────────── //
+    {
+        id: 'streak_3', emoji: '🌟', name: 'On Fire', category: 'consistency',
+        desc: 'Maintain a 3-day study streak.',
+        check: s => ({ earned: s.streak >= 3, progress: Math.min(1, s.streak / 3), label: `${s.streak}/3 days` }),
+    },
+    {
+        id: 'streak_7', emoji: '🔥', name: 'Week Warrior', category: 'consistency',
+        desc: 'Maintain a 7-day study streak.',
+        check: s => ({ earned: s.streak >= 7, progress: Math.min(1, s.streak / 7), label: `${s.streak}/7 days` }),
+    },
+    {
+        id: 'streak_14', emoji: '💪', name: 'Fortnight Force', category: 'consistency',
+        desc: 'Maintain a 14-day study streak.',
+        check: s => ({ earned: s.streak >= 14, progress: Math.min(1, s.streak / 14), label: `${s.streak}/14 days` }),
+    },
+    {
+        id: 'streak_21', emoji: '🦁', name: 'Consistency King', category: 'consistency',
+        desc: 'Maintain a 21-day study streak.',
+        check: s => ({ earned: s.streak >= 21, progress: Math.min(1, s.streak / 21), label: `${s.streak}/21 days` }),
+    },
+
+    // ── Goals ─────────────────────────────────────────────────── //
+    {
+        id: 'first_goal', emoji: '🎯', name: 'Goal Setter', category: 'goals',
+        desc: 'Create your first goal.',
+        check: s => ({ earned: s.totalGoals >= 1, progress: Math.min(1, s.totalGoals), label: `${s.totalGoals}/1 goal` }),
+    },
+    {
+        id: 'goal_completed', emoji: '✨', name: 'Goal Getter', category: 'goals',
+        desc: 'Complete your first goal.',
+        check: s => ({ earned: s.completedGoals >= 1, progress: Math.min(1, s.completedGoals), label: `${s.completedGoals}/1 completed` }),
+    },
+    {
+        id: 'five_goals', emoji: '🏆', name: 'Overachiever', category: 'goals',
+        desc: 'Complete 5 goals.',
+        check: s => ({ earned: s.completedGoals >= 5, progress: Math.min(1, s.completedGoals / 5), label: `${s.completedGoals}/5 goals` }),
+    },
+
+    // ── Attendance ────────────────────────────────────────────── //
+    {
+        id: 'first_att', emoji: '📅', name: 'Present!', category: 'attendance',
+        desc: 'Log your first attendance record.',
+        check: s => ({ earned: s.totalAtt >= 1, progress: Math.min(1, s.totalAtt), label: `${s.totalAtt}/1 record` }),
+    },
+    {
+        id: 'att_75', emoji: '✅', name: 'Reliable', category: 'attendance',
+        desc: 'Maintain ≥75% overall attendance.',
+        check: s => ({ earned: s.attPct >= 75, progress: Math.min(1, s.attPct / 75), label: `${s.attPct}% / 75%` }),
+    },
+    {
+        id: 'att_90', emoji: '🌟', name: 'Attendance Champion', category: 'attendance',
+        desc: 'Maintain ≥90% overall attendance.',
+        check: s => ({ earned: s.attPct >= 90, progress: Math.min(1, s.attPct / 90), label: `${s.attPct}% / 90%` }),
+    },
+
+    // ── Tasks ──────────────────────────────────────────────────── //
+    {
+        id: 'first_task', emoji: '📝', name: 'Planner', category: 'tasks',
+        desc: 'Create your first task.',
+        check: s => ({ earned: s.totalTasks >= 1, progress: Math.min(1, s.totalTasks), label: `${s.totalTasks}/1 task` }),
+    },
+    {
+        id: 'five_tasks_done', emoji: '☑️', name: 'Getting Things Done', category: 'tasks',
+        desc: 'Complete 5 tasks.',
+        check: s => ({ earned: s.doneTasks >= 5, progress: Math.min(1, s.doneTasks / 5), label: `${s.doneTasks}/5 tasks` }),
+    },
+    {
+        id: 'ten_tasks_done', emoji: '🚀', name: 'Task Master', category: 'tasks',
+        desc: 'Complete 10 tasks.',
+        check: s => ({ earned: s.doneTasks >= 10, progress: Math.min(1, s.doneTasks / 10), label: `${s.doneTasks}/10 tasks` }),
+    },
+];
+
+/* ── Compute stats snapshot ───────────────────────────────────────── */
+function computeStats() {
+    const logs  = Store.getStudyLogs();
+    const att   = Store.getAttendance();
+    const goals = Store.getGoals();
+    const tasks = Store.getTasks();
+
+    const totalHours     = logs.reduce((s, l) => s + l.hours, 0);
+    const present        = att.filter(a => a.status === 'present' || a.status === 'late').length;
+    const pomodoros      = logs.filter(l => l.source === 'pomodoro').length;
+    const uniqueSubjects = new Set(logs.map(l => l.subject)).size;
+
+    return {
+        totalSessions  : logs.length,
+        totalHours,
+        uniqueSubjects,
+        pomodoros,
+        streak         : Store.calculateStreak(),
+        totalGoals     : goals.length,
+        completedGoals : goals.filter(g => g.current >= g.target).length,
+        totalAtt       : att.length,
+        attPct         : att.length > 0 ? Math.round((present / att.length) * 100) : 0,
+        totalTasks     : tasks.length,
+        doneTasks      : tasks.filter(t => t.completed).length,
+    };
+}
+
+/* ── Render ───────────────────────────────────────────────────────── */
+let currentCat = 'all';
+
+function renderBadges() {
+    const stats    = computeStats();
+    const results  = BADGES.map(b => ({ ...b, _check: b.check(stats) }));
+    const earned   = results.filter(r => r._check.earned).length;
+    const total    = BADGES.length;
+    const pct      = Math.round((earned / total) * 100);
+
+    // Summary banner
+    document.getElementById('earnedPct').textContent     = pct + '%';
+    document.getElementById('earnedCount').textContent   = earned;
+    document.getElementById('totalCount').textContent    = total;
+    document.getElementById('earnedBar').style.width     = pct + '%';
+
+    const titles = ['Keep going!', 'Nice start!', 'You\'re getting there!', 'Halfway there!', 'Almost there!', 'Badge master! 🎉'];
+    const idx    = Math.floor((pct / 100) * (titles.length - 1));
+    document.getElementById('earnedTitle').textContent    = titles[Math.min(idx, titles.length - 1)];
+    document.getElementById('earnedSubtitle').textContent = `${earned} of ${total} badges unlocked. ${total - earned} more to go.`;
+
+    // Filter & sort: earned first
+    const filtered = currentCat === 'all'
+        ? results
+        : results.filter(r => r.category === currentCat);
+
+    const sorted = [...filtered].sort((a, b) => {
+        if (a._check.earned && !b._check.earned) return -1;
+        if (!a._check.earned && b._check.earned) return 1;
+        return b._check.progress - a._check.progress;
+    });
+
+    const grid = document.getElementById('badgeGrid');
+    grid.innerHTML = sorted.map(b => {
+        const { earned, progress, label } = b._check;
+        const pctW = Math.round(progress * 100);
+        return `
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="badge-card ${earned ? 'earned' : 'locked'}">
+                ${earned ? '<span class="badge-earned-tag">Earned</span>' : ''}
+                <span class="badge-emoji">${b.emoji}</span>
+                <div class="badge-name">${Store.escapeHtml(b.name)}</div>
+                <div class="badge-desc">${Store.escapeHtml(b.desc)}</div>
+                ${!earned ? `
+                <div class="badge-progress-wrap">
+                    <div class="badge-progress-track">
+                        <div class="badge-progress-fill" style="width:${pctW}%"></div>
+                    </div>
+                    <div class="badge-progress-label">${Store.escapeHtml(label)}</div>
+                </div>
+                ` : ''}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+/* ── Category tabs ────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', function () {
+    lucide.createIcons();
+    Store.hydrateSidebar();
+
+    // Alert badge
+    const unread = Store.getAlerts().filter(a => !a.read).length;
+    const ab = document.getElementById('alert-badge');
+    if (ab) { ab.textContent = unread; ab.style.display = unread > 0 ? 'inline-block' : 'none'; }
+
+    document.getElementById('catTabs').addEventListener('click', e => {
+        const tab = e.target.closest('.cat-tab');
+        if (!tab) return;
+        document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentCat = tab.dataset.cat;
+        renderBadges();
+    });
+
+    renderBadges();
+});
+</script>
+</body>
+</html>

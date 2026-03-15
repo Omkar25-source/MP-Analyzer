@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudySync - Login</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-color: #f1f5f9;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        body,
+        html {
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            overflow: hidden;
+            /* Prevents scrollbars from background animation */
+        }
+
+        /* Animated Background */
+        .bg-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            background: #f8fafc;
+        }
+
+        .shape {
+            position: absolute;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: float 10s infinite ease-in-out alternate;
+        }
+
+        .shape-1 {
+            top: -10%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            background: #e0e7ff;
+            border-radius: 50%;
+        }
+
+        .shape-2 {
+            bottom: -10%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: #d1fae5;
+            border-radius: 50%;
+            animation-delay: -5s;
+        }
+
+        .shape-3 {
+            top: 40%;
+            left: 60%;
+            width: 400px;
+            height: 400px;
+            background: #fef3c7;
+            border-radius: 50%;
+            animation-delay: -2s;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            100% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
+        }
+
+        /* Center Content Wrapper */
+        .login-wrapper {
+            position: relative;
+            z-index: 1;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        /* Glassmorphism Card */
+        .auth-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            padding: 3rem 2.5rem;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Logo & Header */
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .brand-icon {
+            background: var(--primary-color);
+            color: white;
+            padding: 10px;
+            border-radius: 12px;
+            display: flex;
+        }
+
+        .auth-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* Form Inputs */
+        .form-floating>.form-control {
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-floating>.form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+        }
+
+        .form-floating>label {
+            color: var(--text-muted);
+            padding-left: 1rem;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 0.875rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -5px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Social Login */
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 1.5rem 0;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .divider:not(:empty)::before {
+            margin-right: 1em;
+        }
+
+        .divider:not(:empty)::after {
+            margin-left: 1em;
+        }
+
+        .btn-social {
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            color: var(--text-dark);
+            padding: 0.75rem;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-social:hover {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Animated Background Elements -->
+    <div class="bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <div class="login-wrapper">
+        <!-- Centered Login Card -->
+        <div class="auth-card">
+
+            <div class="brand-logo">
+                <div class="brand-icon">
+                    <i data-lucide="layout-dashboard" size="24"></i>
+                </div>
+                StudySync
+            </div>
+            <p class="auth-subtitle">Welcome back! Please enter your details.</p>
+
+            <form id="loginForm">
+                <!-- Floating Label Input for Email -->
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" required>
+                    <label for="floatingInput">Email address</label>
+                </div>
+
+                <!-- Floating Label Input for Password -->
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" id="floatingPassword" placeholder="Password" required>
+                    <label for="floatingPassword">Password</label>
+                </div>
+
+                <!-- Options -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="rememberMe">
+                        <label class="form-check-label text-muted small" for="rememberMe">
+                            Remember me
+                        </label>
+                    </div>
+                    <a href="#" class="text-primary text-decoration-none small fw-medium">Forgot password?</a>
+                </div>
+
+                <!-- Main CTA -->
+                <button type="submit" class="btn btn-primary w-100">Sign In</button>
+            </form>
+
+            <div class="divider">or continue with</div>
+
+            <!-- Social Buttons -->
+            <div class="row g-2 mb-4">
+                <div class="col-6">
+                    <button class="btn btn-social w-100">
+                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="20" alt="Google"> Google
+                    </button>
+                </div>
+                <div class="col-6">
+                    <button class="btn btn-social w-100">
+                        <img src="https://www.svgrepo.com/show/512317/github-142.svg" width="20" alt="GitHub"> GitHub
+                    </button>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <p class="text-muted small mb-0">Don't have an account? <a href="#"
+                        class="text-primary text-decoration-none fw-bold">Sign up</a></p>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Initialize standard Lucide Icons
+        lucide.createIcons();
+
+        // Smart login routing:
+        //   • If a user profile already exists in localStorage → go directly to Dashboard
+        //   • Otherwise → go to Profile Setup first
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            try {
+                const savedUser = JSON.parse(localStorage.getItem('ss_user') || 'null');
+                const hasProfile = savedUser && savedUser.name && savedUser.name !== 'Student';
+                if (hasProfile) {
+                    window.location.href = 'Frontend/Pages/Dashboard/Dashboard.html';
+                } else {
+                    window.location.href = 'Frontend/Pages/Profile-setup/profile-setup.html';
+                }
+            } catch (_) {
+                // Fallback: always go to profile setup on any error
+                window.location.href = 'Frontend/Pages/Profile-setup/profile-setup.html';
+            }
+        });
+    </script>
+</body>
+
+</html>

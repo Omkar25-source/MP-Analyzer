@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudySync - Weekly Review</title>
+    <meta name="description" content="Reflect on your week — study hours, attendance, goals, and personal insights.">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../../assets/css/style.css">
+
+    <style>
+        /* ── Weekly Review specific styles ── */
+        .week-nav-btn {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 6px 14px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .week-nav-btn:hover {
+            background: #e0e7ff;
+            color: var(--primary-color);
+            border-color: #c7d2fe;
+        }
+
+        .week-label {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            min-width: 240px;
+            text-align: center;
+        }
+
+        /* Mood stars */
+        .mood-stars {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .mood-star {
+            font-size: 1.8rem;
+            cursor: pointer;
+            opacity: 0.35;
+            transition: opacity 0.15s, transform 0.15s;
+            user-select: none;
+        }
+
+        .mood-star:hover,
+        .mood-star.active {
+            opacity: 1;
+            transform: scale(1.15);
+        }
+
+        /* Insight cards */
+        .insight-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f1f5f9;
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin: 4px;
+        }
+
+        .insight-chip.good {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .insight-chip.warn {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .insight-chip.bad {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .insight-chip.info {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+
+        /* Reflection box */
+        #reflectionNotes {
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 1rem;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            resize: vertical;
+            min-height: 120px;
+            transition: border-color 0.2s;
+        }
+
+        #reflectionNotes:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+        }
+
+        /* Save button feedback */
+        .save-btn-saved {
+            background-color: #10b981 !important;
+            border-color: #10b981 !important;
+        }
+
+        /* Chart container */
+        .week-chart-wrap {
+            position: relative;
+            height: 180px;
+        }
+
+        /* History list */
+        .review-history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .review-history-item:hover {
+            border-color: var(--primary-color);
+            background: #f5f3ff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <a href="../../index.html" class="sidebar-brand">
+                <div class="icon-container">
+                    <i data-lucide="layout-dashboard"></i>
+                </div>
+                <div>
+                    <div style="line-height: 1.2; color: var(--text-dark);">StudySync</div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: normal;">Performance Tracker</div>
+                </div>
+            </a>
+
+            <nav class="sidebar-nav">
+                <a href="../Dashboard/Dashboard.html" class="nav-item">
+                    <i data-lucide="layout-grid"></i> Dashboard
+                </a>
+                <a href="../Study-Planner/Study-Planner.html" class="nav-item">
+                    <i data-lucide="book-open"></i> Study Planner
+                </a>
+                <a href="../Goals/Goals.html" class="nav-item">
+                    <i data-lucide="target"></i> Goals
+                </a>
+                <a href="../attendance/attendance.html" class="nav-item">
+                    <i data-lucide="calendar-check"></i> Attendance
+                </a>
+                <a href="../Alerts/Alerts.html" class="nav-item">
+                    <i data-lucide="bell"></i> Alerts
+                    <span class="badge bg-danger rounded-pill ms-auto" id="alert-badge" style="display:none;">0</span>
+                </a>
+                <a href="weekly-review.html" class="nav-item active">
+                    <i data-lucide="clipboard-list"></i> Weekly Review
+                </a>
+                <a href="../Analytics/analytics.html" class="nav-item">
+                    <i data-lucide="bar-chart-2"></i> Analytics
+                </a>
+                <a href="../Achievements/achievements.html" class="nav-item">
+                    <i data-lucide="award"></i> Achievements
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar" id="user-initials">S</div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.9rem;" id="user-name-display">Student</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);" id="user-meta">Semester 1, CSE</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Mobile Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4 mobile-toggle">
+                <button class="btn btn-light border"
+                    onclick="document.getElementById('sidebar').classList.toggle('show')">
+                    <i data-lucide="menu"></i>
+                </button>
+                <h5 class="m-0 font-weight-bold">Weekly Review</h5>
+            </div>
+
+            <!-- Page Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                <div>
+                    <h2 class="fw-bold mb-1">Weekly Review 📋</h2>
+                    <p class="text-muted mb-0">Reflect on your week and plan for the next one.</p>
+                </div>
+                <!-- Week navigation -->
+                <div class="d-flex align-items-center gap-2">
+                    <button class="week-nav-btn" id="prevWeekBtn">
+                        <i data-lucide="chevron-left" size="14"></i> Prev
+                    </button>
+                    <span class="week-label" id="weekLabel">—</span>
+                    <button class="week-nav-btn" id="nextWeekBtn">
+                        Next <i data-lucide="chevron-right" size="14"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="row g-4">
+
+                <!-- ── Left column: Stats & charts ── -->
+                <div class="col-lg-7">
+
+                    <!-- Stats summary row -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-6 col-md-3">
+                            <div class="custom-card text-center py-3">
+                                <div class="stat-value fs-3" id="wr-hours">0</div>
+                                <div class="stat-label">Study Hours</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="custom-card text-center py-3">
+                                <div class="stat-value fs-3" id="wr-attendance">0%</div>
+                                <div class="stat-label">Attendance</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="custom-card text-center py-3">
+                                <div class="stat-value fs-3" id="wr-goals">0</div>
+                                <div class="stat-label">Goals Done</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="custom-card text-center py-3">
+                                <div class="stat-value fs-3" id="wr-tasks">0</div>
+                                <div class="stat-label">Tasks Done</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Daily study hours chart -->
+                    <div class="custom-card mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0">
+                                <i data-lucide="bar-chart-2" size="18" class="text-primary me-2"></i>
+                                Daily Study Hours
+                            </h5>
+                        </div>
+                        <div class="week-chart-wrap">
+                            <canvas id="weeklyBarChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Auto-generated insights -->
+                    <div class="custom-card">
+                        <h5 class="fw-bold mb-3">
+                            <i data-lucide="zap" size="18" class="text-warning me-2"></i>
+                            Auto Insights
+                        </h5>
+                        <div id="insightsContainer" class="d-flex flex-wrap gap-1">
+                            <span class="insight-chip">No data yet for this week.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Right column: Reflection + history ── -->
+                <div class="col-lg-5">
+
+                    <!-- Mood tracker -->
+                    <div class="custom-card mb-4">
+                        <h5 class="fw-bold mb-1">
+                            <i data-lucide="smile" size="18" class="text-success me-2"></i>
+                            Weekly Mood
+                        </h5>
+                        <p class="text-muted small mb-2">How did this week feel overall?</p>
+                        <div class="mood-stars" id="moodStars">
+                            <span class="mood-star" data-rating="1" title="Terrible">😞</span>
+                            <span class="mood-star" data-rating="2" title="Bad">😕</span>
+                            <span class="mood-star" data-rating="3" title="Okay">😐</span>
+                            <span class="mood-star" data-rating="4" title="Good">🙂</span>
+                            <span class="mood-star" data-rating="5" title="Great">😄</span>
+                        </div>
+                        <div class="text-muted small mt-2" id="moodLabel">Click a mood to rate your week</div>
+                    </div>
+
+                    <!-- Written reflection -->
+                    <div class="custom-card mb-4">
+                        <h5 class="fw-bold mb-1">
+                            <i data-lucide="edit-3" size="18" class="text-primary me-2"></i>
+                            Reflection
+                        </h5>
+                        <p class="text-muted small mb-2">What went well? What can you improve?</p>
+                        <textarea id="reflectionNotes" class="w-100"
+                            placeholder="e.g. Completed all my DS assignments on time. Need to revise Maths more next week…"></textarea>
+                        <button class="btn btn-primary w-100 mt-3 fw-bold d-flex align-items-center justify-content-center gap-2"
+                            id="saveReviewBtn">
+                            <i data-lucide="save" size="16"></i> Save This Review
+                        </button>
+                    </div>
+
+                    <!-- Past reviews -->
+                    <div class="custom-card">
+                        <h5 class="fw-bold mb-3">
+                            <i data-lucide="history" size="18" class="text-muted me-2"></i>
+                            Past Reviews
+                        </h5>
+                        <div id="reviewHistory">
+                            <div class="text-muted small text-center py-3">No saved reviews yet.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Theme (dark mode) -->
+    <script src="../../assets/js/theme.js"></script>
+    <!-- Shared Store (must load first) -->
+    <script src="../../assets/js/store.js"></script>
+
+    <script>
+        /* ────────────────────────────────────────────────────────────
+           Weekly Review — StudySync
+           Reads from Store (localStorage). Saves review objects under
+           the key 'ss_weekly_reviews' (array, newest first).
+        ──────────────────────────────────────────────────────────── */
+
+        document.addEventListener('DOMContentLoaded', function () {
+            lucide.createIcons();
+            Store.hydrateSidebar();
+            initWeeklyReview();
+        });
+
+        // ── Week navigation state ──────────────────────────────────
+        let weekOffset = 0; // 0 = current week, -1 = last week, etc.
+
+        function getWeekBounds(offset) {
+            const now = new Date();
+            const day = now.getDay(); // 0 = Sun
+            const monday = new Date(now);
+            monday.setDate(now.getDate() - ((day + 6) % 7) + offset * 7);
+            monday.setHours(0, 0, 0, 0);
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            sunday.setHours(23, 59, 59, 999);
+            return { monday, sunday };
+        }
+
+        function toYMD(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        function formatDateShort(date) {
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
+        // ── Reviews storage ────────────────────────────────────────
+        const REVIEWS_KEY = 'ss_weekly_reviews';
+
+        function getReviews() {
+            try { return JSON.parse(localStorage.getItem(REVIEWS_KEY) || '[]'); }
+            catch { return []; }
+        }
+
+        function saveReviews(reviews) {
+            localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews));
+        }
+
+        function getReviewForWeek(weekStart) {
+            return getReviews().find(r => r.weekStart === weekStart) || null;
+        }
+
+        function upsertReview(review) {
+            const reviews = getReviews().filter(r => r.weekStart !== review.weekStart);
+            reviews.unshift(review);
+            saveReviews(reviews);
+        }
+
+        // ── Current mood selection ─────────────────────────────────
+        let selectedMood = 0;
+
+        function setMood(rating) {
+            selectedMood = rating;
+            const stars = document.querySelectorAll('.mood-star');
+            const labels = ['', 'Terrible 😞', 'Bad 😕', 'Okay 😐', 'Good 🙂', 'Great! 😄'];
+            stars.forEach(s => {
+                s.classList.toggle('active', parseInt(s.dataset.rating) <= rating);
+            });
+            document.getElementById('moodLabel').textContent = labels[rating] || 'Click a mood to rate your week';
+        }
+
+        // ── Render for a given weekOffset ─────────────────────────
+        function renderWeek() {
+            const { monday, sunday } = getWeekBounds(weekOffset);
+            const mondayStr = toYMD(monday);
+            const sundayStr = toYMD(sunday);
+
+            // Week label
+            document.getElementById('weekLabel').textContent =
+                `${formatDateShort(monday)} – ${formatDateShort(sunday)}`;
+
+            // Disable next button if current week
+            document.getElementById('nextWeekBtn').disabled = weekOffset >= 0;
+
+            // ── Compute stats from Store ───────────────────────────
+            const logs       = Store.getStudyLogs();
+            const attendance = Store.getAttendance();
+            const goals      = Store.getGoals();
+            const tasks      = Store.getTasks();
+
+            // Study hours this week
+            const weekLogs = logs.filter(l => l.date >= mondayStr && l.date <= sundayStr);
+            const totalHours = weekLogs.reduce((sum, l) => sum + l.hours, 0);
+
+            // Attendance this week
+            const weekAtt = attendance.filter(a => a.date >= mondayStr && a.date <= sundayStr);
+            const present = weekAtt.filter(a => a.status === 'present' || a.status === 'late').length;
+            const attPct  = weekAtt.length > 0 ? Math.round((present / weekAtt.length) * 100) : 0;
+
+            // Goals completed (overall completed count — goals don't have dates easily)
+            const goalsCompleted = goals.filter(g => g.current >= g.target).length;
+
+            // Tasks completed this week (by due date)
+            const weekTasksDone = tasks.filter(t =>
+                t.completed && t.date >= mondayStr && t.date <= sundayStr
+            ).length;
+
+            // Update stat cards
+            document.getElementById('wr-hours').textContent      = totalHours.toFixed(1);
+            document.getElementById('wr-attendance').textContent = `${attPct}%`;
+            document.getElementById('wr-goals').textContent      = goalsCompleted;
+            document.getElementById('wr-tasks').textContent      = weekTasksDone;
+
+            // ── Bar chart: daily hours ─────────────────────────────
+            const days   = [];
+            const hours  = [];
+            const colors = [];
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(monday);
+                d.setDate(monday.getDate() + i);
+                const dStr = toYMD(d);
+                days.push(d.toLocaleDateString('en-US', { weekday: 'short' }));
+                const dayHrs = logs.filter(l => l.date === dStr).reduce((s, l) => s + l.hours, 0);
+                hours.push(dayHrs);
+                colors.push(dayHrs >= (Store.getUser().targetHours || 8) ? '#10b981' : '#6366f1');
+            }
+
+            if (window._weekChart) {
+                window._weekChart.data.labels                  = days;
+                window._weekChart.data.datasets[0].data        = hours;
+                window._weekChart.data.datasets[0].backgroundColor = colors;
+                window._weekChart.update();
+            } else {
+                const ctx = document.getElementById('weeklyBarChart').getContext('2d');
+                window._weekChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: days,
+                        datasets: [{
+                            label: 'Study Hours',
+                            data: hours,
+                            backgroundColor: colors,
+                            borderRadius: 6,
+                            barPercentage: 0.6,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                    }
+                });
+            }
+
+            // ── Auto insights ──────────────────────────────────────
+            const insights = buildInsights(totalHours, attPct, goalsCompleted, weekTasksDone, weekLogs, weekAtt);
+            const container = document.getElementById('insightsContainer');
+            if (insights.length === 0) {
+                container.innerHTML = '<span class="insight-chip">No data yet for this week.</span>';
+            } else {
+                container.innerHTML = insights.map(ins =>
+                    `<span class="insight-chip ${Store.escapeHtml(ins.cls)}">${ins.text}</span>`
+                ).join('');
+            }
+
+            // ── Load saved review if exists ────────────────────────
+            const saved = getReviewForWeek(mondayStr);
+            selectedMood = saved ? (saved.mood || 0) : 0;
+            setMood(selectedMood);
+            document.getElementById('reflectionNotes').value = saved ? (saved.notes || '') : '';
+        }
+
+        // ── Build insight chips ────────────────────────────────────
+        function buildInsights(hours, attPct, goalsCompleted, tasksDone, weekLogs, weekAtt) {
+            const ins = [];
+            const user = Store.getUser();
+            const target = (user.targetHours || 8) * 7;
+
+            if (weekLogs.length === 0 && weekAtt.length === 0) return ins;
+
+            if (hours >= target) {
+                ins.push({ cls: 'good', text: '🎯 Met weekly study target!' });
+            } else if (hours > 0) {
+                const pct = Math.round((hours / target) * 100);
+                ins.push({ cls: 'warn', text: `📚 ${pct}% of study target done` });
+            } else {
+                ins.push({ cls: 'bad', text: '⚠️ No study hours logged' });
+            }
+
+            if (attPct >= 90) {
+                ins.push({ cls: 'good', text: '✅ Excellent attendance (≥90%)' });
+            } else if (attPct >= 75) {
+                ins.push({ cls: 'good', text: `📅 Good attendance (${attPct}%)` });
+            } else if (attPct > 0) {
+                ins.push({ cls: 'bad', text: `⚠️ Low attendance (${attPct}%)` });
+            }
+
+            // Study streak
+            const streak = Store.calculateStreak();
+            if (streak >= 7) {
+                ins.push({ cls: 'good', text: `🔥 ${streak}-day study streak!` });
+            } else if (streak >= 3) {
+                ins.push({ cls: 'info', text: `🔥 ${streak}-day streak — keep it up` });
+            }
+
+            if (goalsCompleted > 0) {
+                ins.push({ cls: 'good', text: `🏆 ${goalsCompleted} goal${goalsCompleted > 1 ? 's' : ''} completed` });
+            }
+
+            if (tasksDone > 0) {
+                ins.push({ cls: 'info', text: `✔️ ${tasksDone} task${tasksDone > 1 ? 's' : ''} completed this week` });
+            }
+
+            // Study days count
+            const studyDays = new Set(weekLogs.map(l => l.date)).size;
+            if (studyDays === 7) {
+                ins.push({ cls: 'good', text: '⭐ Studied all 7 days!' });
+            } else if (studyDays <= 2 && weekLogs.length > 0) {
+                ins.push({ cls: 'warn', text: `📆 Only studied ${studyDays} day${studyDays > 1 ? 's' : ''} — try spreading it out` });
+            }
+
+            return ins;
+        }
+
+        // ── Render past reviews list ───────────────────────────────
+        function renderHistory() {
+            const list    = getReviews();
+            const el      = document.getElementById('reviewHistory');
+            if (list.length === 0) {
+                el.innerHTML = '<div class="text-muted small text-center py-3">No saved reviews yet.</div>';
+                return;
+            }
+
+            const moodEmojis = ['', '😞', '😕', '😐', '🙂', '😄'];
+            el.innerHTML = list.slice(0, 8).map(r => {
+                const start = new Date(r.weekStart + 'T00:00:00');
+                const end   = new Date(start);
+                end.setDate(start.getDate() + 6);
+                return `
+                <div class="review-history-item" data-week="${Store.escapeHtml(r.weekStart)}">
+                    <div>
+                        <div class="fw-semibold" style="font-size:0.85rem;">
+                            ${formatDateShort(start)} – ${formatDateShort(end)}
+                        </div>
+                        <div class="text-muted" style="font-size:0.75rem;">
+                            ${r.studyHours?.toFixed(1) || 0}h studied · ${r.attendance || 0}% attendance
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span style="font-size:1.3rem;">${moodEmojis[r.mood || 0] || '—'}</span>
+                    </div>
+                </div>`;
+            }).join('');
+
+            el.querySelectorAll('.review-history-item').forEach(item => {
+                item.addEventListener('click', function () {
+                    const weekStart = new Date(this.dataset.week + 'T00:00:00');
+                    const today = new Date();
+                    const thisMonday = new Date(today);
+                    thisMonday.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+                    thisMonday.setHours(0, 0, 0, 0);
+                    const diffMs = weekStart - thisMonday;
+                    weekOffset = Math.round(diffMs / (7 * 86400000));
+                    renderWeek();
+                });
+            });
+        }
+
+        // ── Save review ────────────────────────────────────────────
+        function saveCurrentReview() {
+            const { monday, sunday } = getWeekBounds(weekOffset);
+            const mondayStr = toYMD(monday);
+            const sundayStr = toYMD(sunday);
+
+            const logs       = Store.getStudyLogs();
+            const attendance = Store.getAttendance();
+            const weekLogs   = logs.filter(l => l.date >= mondayStr && l.date <= sundayStr);
+            const weekAtt    = attendance.filter(a => a.date >= mondayStr && a.date <= sundayStr);
+            const present    = weekAtt.filter(a => a.status === 'present' || a.status === 'late').length;
+
+            const review = {
+                weekStart  : mondayStr,
+                mood       : selectedMood,
+                notes      : document.getElementById('reflectionNotes').value.trim(),
+                studyHours : parseFloat(weekLogs.reduce((s, l) => s + l.hours, 0).toFixed(1)),
+                attendance : weekAtt.length > 0 ? Math.round((present / weekAtt.length) * 100) : 0,
+                savedAt    : new Date().toISOString(),
+            };
+
+            upsertReview(review);
+
+            // Button feedback
+            const btn = document.getElementById('saveReviewBtn');
+            btn.textContent = '✓ Saved!';
+            btn.classList.add('save-btn-saved');
+            setTimeout(() => {
+                btn.innerHTML = '<i data-lucide="save" size="16"></i> Save This Review';
+                btn.classList.remove('save-btn-saved');
+                lucide.createIcons();
+            }, 2000);
+
+            renderHistory();
+        }
+
+        // ── Init ───────────────────────────────────────────────────
+        function initWeeklyReview() {
+            // Week navigation
+            document.getElementById('prevWeekBtn').addEventListener('click', () => {
+                weekOffset--;
+                renderWeek();
+            });
+
+            document.getElementById('nextWeekBtn').addEventListener('click', () => {
+                if (weekOffset < 0) { weekOffset++; renderWeek(); }
+            });
+
+            // Mood stars
+            document.querySelectorAll('.mood-star').forEach(star => {
+                star.addEventListener('click', () => setMood(parseInt(star.dataset.rating)));
+            });
+
+            // Save button
+            document.getElementById('saveReviewBtn').addEventListener('click', saveCurrentReview);
+
+            // Update alert badge
+            const unread     = Store.getAlerts().filter(a => !a.read).length;
+            const alertBadge = document.getElementById('alert-badge');
+            if (alertBadge) {
+                alertBadge.textContent   = unread;
+                alertBadge.style.display = unread > 0 ? 'inline-block' : 'none';
+            }
+
+            renderWeek();
+            renderHistory();
+        }
+    </script>
+</body>
+
+</html>

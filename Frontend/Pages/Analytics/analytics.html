@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudySync - Analytics</title>
+    <meta name="description" content="Deep performance analytics — study trends, subject balance, attendance breakdown and goal progress.">
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../../assets/css/style.css">
+
+    <style>
+        .analytics-stat-card {
+            border-left: 4px solid transparent;
+            transition: transform 0.2s;
+        }
+        .analytics-stat-card:hover { transform: translateY(-2px); }
+        .analytics-stat-card.indigo { border-left-color: #6366f1; }
+        .analytics-stat-card.green  { border-left-color: #10b981; }
+        .analytics-stat-card.orange { border-left-color: #f59e0b; }
+        .analytics-stat-card.pink   { border-left-color: #d946ef; }
+
+        .chart-card { position: relative; }
+        .chart-wrap { position: relative; }
+
+        .subject-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .subject-row-label {
+            min-width: 120px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .subject-bar-track {
+            flex: 1;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .subject-bar-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.6s ease;
+        }
+        .subject-row-value {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            min-width: 36px;
+            text-align: right;
+        }
+
+        .period-btn {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 4px 12px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .period-btn.active,
+        .period-btn:hover {
+            background: #e0e7ff;
+            border-color: #c7d2fe;
+            color: #4338ca;
+        }
+
+        .no-data-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            background: rgba(248,250,252,0.9);
+            border-radius: 12px;
+            z-index: 2;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        body.dark-mode .analytics-stat-card { background-color: #1e293b; }
+        body.dark-mode .subject-bar-track   { background: #334155; }
+        body.dark-mode .no-data-overlay     { background: rgba(15,23,42,0.9); }
+        body.dark-mode .period-btn          { background: #1e293b; border-color: #334155; }
+        body.dark-mode .period-btn.active,
+        body.dark-mode .period-btn:hover    { background: #312e81; border-color: #4f46e5; color: #a5b4fc; }
+    </style>
+</head>
+
+<body>
+<div class="app-container">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <a href="../../index.html" class="sidebar-brand">
+            <div class="icon-container"><i data-lucide="layout-dashboard"></i></div>
+            <div>
+                <div style="line-height:1.2;color:var(--text-dark)">StudySync</div>
+                <div style="font-size:0.7rem;color:var(--text-muted);font-weight:normal">Performance Tracker</div>
+            </div>
+        </a>
+        <nav class="sidebar-nav">
+            <a href="../Dashboard/Dashboard.html"           class="nav-item"><i data-lucide="layout-grid"></i> Dashboard</a>
+            <a href="../Study-Planner/Study-Planner.html"   class="nav-item"><i data-lucide="book-open"></i> Study Planner</a>
+            <a href="../Goals/Goals.html"                   class="nav-item"><i data-lucide="target"></i> Goals</a>
+            <a href="../attendance/attendance.html"         class="nav-item"><i data-lucide="calendar-check"></i> Attendance</a>
+            <a href="../Alerts/Alerts.html"                 class="nav-item">
+                <i data-lucide="bell"></i> Alerts
+                <span class="badge bg-danger rounded-pill ms-auto" id="alert-badge" style="display:none">0</span>
+            </a>
+            <a href="../Weekly reviews/weekly-review.html"  class="nav-item"><i data-lucide="clipboard-list"></i> Weekly Review</a>
+            <a href="analytics.html"                        class="nav-item active"><i data-lucide="bar-chart-2"></i> Analytics</a>
+            <a href="../Achievements/achievements.html"     class="nav-item"><i data-lucide="award"></i> Achievements</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="avatar" id="user-initials">S</div>
+                <div>
+                    <div style="font-weight:600;font-size:0.9rem" id="user-name-display">Student</div>
+                    <div style="font-size:0.75rem;color:var(--text-muted)" id="user-meta">Semester 1, CSE</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4 mobile-toggle">
+            <button class="btn btn-light border" onclick="document.getElementById('sidebar').classList.toggle('show')">
+                <i data-lucide="menu"></i>
+            </button>
+            <h5 class="m-0 fw-bold">Analytics</h5>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div>
+                <h2 class="fw-bold mb-1">Performance Analytics 📊</h2>
+                <p class="text-muted mb-0">Deep insights from your study, attendance, and goal data.</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap" id="exportBtns">
+                <button class="btn btn-sm btn-light border fw-semibold d-flex align-items-center gap-1" id="exportLogsBtn">
+                    <i data-lucide="download" size="14"></i> Study Logs CSV
+                </button>
+                <button class="btn btn-sm btn-light border fw-semibold d-flex align-items-center gap-1" id="exportAttBtn">
+                    <i data-lucide="download" size="14"></i> Attendance CSV
+                </button>
+                <button class="btn btn-sm btn-primary fw-semibold d-flex align-items-center gap-1" id="exportPdfBtn">
+                    <i data-lucide="file-text" size="14"></i> Full PDF Report
+                </button>
+            </div>
+        </div>
+
+        <!-- ── Stat Cards ── -->
+        <div class="row g-3 mb-4" id="analyticsStats">
+            <div class="col-6 col-md-3">
+                <div class="custom-card analytics-stat-card indigo py-3">
+                    <div class="stat-label">Total Study Hours</div>
+                    <div class="stat-value" id="an-total-hours">0</div>
+                    <div class="text-muted small" id="an-avg-daily">Avg. 0h/day</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="custom-card analytics-stat-card green py-3">
+                    <div class="stat-label">Overall Attendance</div>
+                    <div class="stat-value" id="an-attendance">0%</div>
+                    <div class="text-muted small" id="an-att-records">0 records</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="custom-card analytics-stat-card orange py-3">
+                    <div class="stat-label">Best Streak</div>
+                    <div class="stat-value" id="an-streak">0</div>
+                    <div class="text-muted small">Consecutive days</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="custom-card analytics-stat-card pink py-3">
+                    <div class="stat-label">Performance Score</div>
+                    <div class="stat-value" id="an-perf">0%</div>
+                    <div class="text-muted small">Weighted metric</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <!-- 30-day trend -->
+            <div class="col-lg-8">
+                <div class="custom-card chart-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h5 class="fw-bold mb-0">Study Hours Trend</h5>
+                            <p class="text-muted small mb-0">Daily hours over selected period</p>
+                        </div>
+                        <div class="d-flex gap-1" id="periodBtns">
+                            <button class="period-btn" data-days="7">7d</button>
+                            <button class="period-btn active" data-days="30">30d</button>
+                            <button class="period-btn" data-days="90">90d</button>
+                        </div>
+                    </div>
+                    <div class="chart-wrap" style="height:220px; position:relative">
+                        <canvas id="trendChart"></canvas>
+                        <div class="no-data-overlay" id="trendNoData" style="display:none">
+                            <i data-lucide="inbox" size="32"></i>
+                            <span>No study logs yet. Start logging!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subject focus -->
+            <div class="col-lg-4">
+                <div class="custom-card chart-card h-100">
+                    <h5 class="fw-bold mb-1">Subject Focus</h5>
+                    <p class="text-muted small mb-3">Time distribution across subjects</p>
+                    <div style="position:relative;height:180px">
+                        <canvas id="subjectDoughnut"></canvas>
+                        <div class="no-data-overlay" id="subjectNoData" style="display:none">
+                            <i data-lucide="inbox" size="28"></i>
+                            <span>Log study sessions to see this.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <!-- Attendance by subject -->
+            <div class="col-lg-6">
+                <div class="custom-card h-100">
+                    <h5 class="fw-bold mb-1">Attendance by Subject</h5>
+                    <p class="text-muted small mb-3">Present % per subject</p>
+                    <div id="attSubjectBars">
+                        <div class="text-muted small text-center py-4">No attendance records yet.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weekly comparison -->
+            <div class="col-lg-6">
+                <div class="custom-card chart-card h-100">
+                    <h5 class="fw-bold mb-1">Weekly Comparison</h5>
+                    <p class="text-muted small mb-3">Total hours per week (last 8 weeks)</p>
+                    <div class="chart-wrap" style="height:200px">
+                        <canvas id="weeklyCompChart"></canvas>
+                        <div class="no-data-overlay" id="weeklyCompNoData" style="display:none">
+                            <i data-lucide="inbox" size="28"></i>
+                            <span>Not enough data yet.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Goals analytics -->
+            <div class="col-lg-7">
+                <div class="custom-card">
+                    <h5 class="fw-bold mb-3">Goals Progress</h5>
+                    <div id="goalsProgressList">
+                        <div class="text-muted small text-center py-4">No goals created yet.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subjects studied bar -->
+            <div class="col-lg-5">
+                <div class="custom-card h-100">
+                    <h5 class="fw-bold mb-1">Top Subjects by Hours</h5>
+                    <p class="text-muted small mb-3">All-time total hours per subject</p>
+                    <div id="topSubjectsBar">
+                        <div class="text-muted small text-center py-4">No study logs yet.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../../assets/js/store.js"></script>
+<script src="../../assets/js/theme.js"></script>
+<script src="../../assets/js/export.js"></script>
+
+<script>
+/* ── Analytics Page ─────────────────────────────────────────────── */
+const COLORS = ['#6366f1','#10b981','#f59e0b','#d946ef','#3b82f6','#ef4444','#8b5cf6','#14b8a6'];
+
+let trendDays  = 30;
+let trendChart = null;
+let donutChart = null;
+let weekChart  = null;
+
+document.addEventListener('DOMContentLoaded', function () {
+    lucide.createIcons();
+    Store.hydrateSidebar();
+
+    // Alert badge
+    const unread = Store.getAlerts().filter(a => !a.read).length;
+    const ab = document.getElementById('alert-badge');
+    if (ab) { ab.textContent = unread; ab.style.display = unread > 0 ? 'inline-block' : 'none'; }
+
+    // Export buttons
+    document.getElementById('exportLogsBtn').addEventListener('click', () => Exporter.studyLogsCSV());
+    document.getElementById('exportAttBtn').addEventListener('click',  () => Exporter.attendanceCSV());
+    document.getElementById('exportPdfBtn').addEventListener('click',  () => Exporter.fullReportPDF());
+
+    // Period buttons
+    document.getElementById('periodBtns').addEventListener('click', e => {
+        const btn = e.target.closest('.period-btn');
+        if (!btn) return;
+        document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        trendDays = parseInt(btn.dataset.days);
+        renderTrendChart();
+    });
+
+    renderAll();
+});
+
+function renderAll() {
+    renderStats();
+    renderTrendChart();
+    renderSubjectDoughnut();
+    renderAttendanceBySubject();
+    renderWeeklyComparison();
+    renderGoalsProgress();
+    renderTopSubjects();
+}
+
+/* ── Stat cards ─────────────────────────────────────────────────── */
+function renderStats() {
+    const logs = Store.getStudyLogs();
+    const att  = Store.getAttendance();
+
+    const totalHours = logs.reduce((s, l) => s + l.hours, 0);
+    const studyDays  = new Set(logs.map(l => l.date)).size;
+    const avgDaily   = studyDays > 0 ? (totalHours / studyDays).toFixed(1) : 0;
+
+    document.getElementById('an-total-hours').textContent = totalHours.toFixed(1) + 'h';
+    document.getElementById('an-avg-daily').textContent   = `Avg. ${avgDaily}h/day`;
+    document.getElementById('an-attendance').textContent  = Store.calculateAttendancePercent() + '%';
+    document.getElementById('an-att-records').textContent = att.length + ' records';
+    document.getElementById('an-streak').textContent      = Store.calculateStreak() + 'd';
+    document.getElementById('an-perf').textContent        = Store.calculatePerformanceScore() + '%';
+}
+
+/* ── Trend line chart ────────────────────────────────────────────── */
+function renderTrendChart() {
+    const logs   = Store.getStudyLogs();
+    const labels = [], data = [];
+
+    for (let i = trendDays - 1; i >= 0; i--) {
+        const d    = new Date();
+        d.setDate(d.getDate() - i);
+        const str  = d.toISOString().split('T')[0];
+        labels.push(trendDays <= 14
+            ? d.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' })
+            : trendDays <= 30
+                ? d.toLocaleDateString('en-US', { month:'short', day:'numeric' })
+                : d.toLocaleDateString('en-US', { month:'short', day:'numeric' })
+        );
+        data.push(logs.filter(l => l.date === str).reduce((s, l) => s + l.hours, 0));
+    }
+
+    const hasData = data.some(d => d > 0);
+    document.getElementById('trendNoData').style.display = hasData ? 'none' : 'flex';
+
+    const ctx = document.getElementById('trendChart').getContext('2d');
+    if (trendChart) {
+        trendChart.data.labels          = labels;
+        trendChart.data.datasets[0].data = data;
+        trendChart.update();
+        return;
+    }
+
+    trendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Study Hours',
+                data,
+                borderColor: '#6366f1',
+                backgroundColor: 'rgba(99,102,241,0.08)',
+                borderWidth: 2.5,
+                pointRadius: trendDays <= 14 ? 4 : 2,
+                pointBackgroundColor: '#6366f1',
+                tension: 0.3,
+                fill: true,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ` ${ctx.parsed.y}h study`
+                    }
+                }
+            },
+            scales: {
+                x: { ticks: { maxTicksLimit: trendDays <= 30 ? 10 : 12, maxRotation: 45, font: { size: 10 } } },
+                y: { beginAtZero: true, ticks: { callback: v => v + 'h' } }
+            }
+        }
+    });
+}
+
+/* ── Subject doughnut ────────────────────────────────────────────── */
+function renderSubjectDoughnut() {
+    const logs    = Store.getStudyLogs();
+    const totals  = {};
+    logs.forEach(l => { totals[l.subject] = (totals[l.subject] || 0) + l.hours; });
+    const labels  = Object.keys(totals);
+    const data    = Object.values(totals);
+    const hasData = labels.length > 0;
+
+    document.getElementById('subjectNoData').style.display = hasData ? 'none' : 'flex';
+
+    const ctx = document.getElementById('subjectDoughnut').getContext('2d');
+    if (donutChart) {
+        donutChart.data.labels           = labels;
+        donutChart.data.datasets[0].data = data;
+        donutChart.update();
+        return;
+    }
+
+    donutChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels,
+            datasets: [{ data, backgroundColor: COLORS, borderWidth: 0 }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '68%',
+            plugins: {
+                legend: { position: 'bottom', labels: { font: { size: 10 }, padding: 10 } },
+                tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed}h` } }
+            }
+        }
+    });
+}
+
+/* ── Attendance by subject (horizontal progress bars) ────────────── */
+function renderAttendanceBySubject() {
+    const records  = Store.getAttendance();
+    const container = document.getElementById('attSubjectBars');
+
+    if (records.length === 0) {
+        container.innerHTML = '<div class="text-muted small text-center py-4">No attendance records yet.</div>';
+        return;
+    }
+
+    const bySubject = {};
+    records.forEach(r => {
+        if (!bySubject[r.subject]) bySubject[r.subject] = { total: 0, present: 0 };
+        bySubject[r.subject].total++;
+        if (r.status === 'present' || r.status === 'late') bySubject[r.subject].present++;
+    });
+
+    const sorted = Object.entries(bySubject)
+        .map(([sub, d]) => ({ sub, pct: Math.round((d.present / d.total) * 100), total: d.total }))
+        .sort((a, b) => b.pct - a.pct);
+
+    container.innerHTML = sorted.map((s, i) => {
+        const color = s.pct >= 90 ? '#10b981' : s.pct >= 75 ? '#6366f1' : s.pct >= 60 ? '#f59e0b' : '#ef4444';
+        return `
+        <div class="subject-row">
+            <div class="subject-row-label" title="${Store.escapeHtml(s.sub)}">${Store.escapeHtml(s.sub)}</div>
+            <div class="subject-bar-track">
+                <div class="subject-bar-fill" style="width:${s.pct}%; background:${color}"></div>
+            </div>
+            <div class="subject-row-value" style="color:${color}">${s.pct}%</div>
+        </div>`;
+    }).join('');
+}
+
+/* ── Weekly comparison (last 8 weeks) ────────────────────────────── */
+function renderWeeklyComparison() {
+    const logs    = Store.getStudyLogs();
+    const labels  = [], data = [];
+
+    for (let w = 7; w >= 0; w--) {
+        const end   = new Date();
+        end.setDate(end.getDate() - w * 7);
+        const start = new Date(end);
+        start.setDate(end.getDate() - 6);
+        const s = start.toISOString().split('T')[0];
+        const e = end.toISOString().split('T')[0];
+        const weekHours = logs.filter(l => l.date >= s && l.date <= e).reduce((sum, l) => sum + l.hours, 0);
+        labels.push(start.toLocaleDateString('en-US', { month:'short', day:'numeric' }));
+        data.push(parseFloat(weekHours.toFixed(1)));
+    }
+
+    const hasData = data.some(d => d > 0);
+    document.getElementById('weeklyCompNoData').style.display = hasData ? 'none' : 'flex';
+
+    const ctx = document.getElementById('weeklyCompChart').getContext('2d');
+    if (weekChart) {
+        weekChart.data.labels          = labels;
+        weekChart.data.datasets[0].data = data;
+        weekChart.update();
+        return;
+    }
+
+    weekChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Hours',
+                data,
+                backgroundColor: data.map((d, i) => i === data.length - 1 ? '#6366f1' : '#c7d2fe'),
+                borderRadius: 6,
+                barPercentage: 0.7,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { callback: v => v + 'h' } }, x: { ticks: { font: { size: 9 } } } }
+        }
+    });
+}
+
+/* ── Goals progress list ─────────────────────────────────────────── */
+function renderGoalsProgress() {
+    const goals     = Store.getGoals();
+    const container = document.getElementById('goalsProgressList');
+
+    if (goals.length === 0) {
+        container.innerHTML = '<div class="text-muted small text-center py-4">No goals created yet.</div>';
+        return;
+    }
+
+    container.innerHTML = goals.map((g, i) => {
+        const pct   = Math.min(100, Math.round((g.current / g.target) * 100));
+        const color = pct >= 100 ? '#10b981' : pct >= 50 ? '#6366f1' : '#f59e0b';
+        return `
+        <div class="mb-3">
+            <div class="d-flex justify-content-between mb-1">
+                <span class="fw-semibold" style="font-size:0.85rem">${Store.escapeHtml(g.title)}</span>
+                <span class="fw-bold" style="font-size:0.82rem; color:${color}">${pct}%</span>
+            </div>
+            <div class="progress-thick" style="height:8px">
+                <div class="progress-bar" style="width:${pct}%; background:${color}"></div>
+            </div>
+            <div class="d-flex justify-content-between mt-1">
+                <span class="text-muted" style="font-size:0.72rem">${g.current} / ${g.target} units</span>
+                <span class="badge" style="font-size:0.65rem; background:${color}22; color:${color}">${Store.escapeHtml(g.category?.toUpperCase() || 'GOAL')}</span>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+/* ── Top subjects by hours (horizontal bars) ─────────────────────── */
+function renderTopSubjects() {
+    const logs      = Store.getStudyLogs();
+    const container = document.getElementById('topSubjectsBar');
+
+    if (logs.length === 0) {
+        container.innerHTML = '<div class="text-muted small text-center py-4">No study logs yet.</div>';
+        return;
+    }
+
+    const totals = {};
+    logs.forEach(l => { totals[l.subject] = (totals[l.subject] || 0) + l.hours; });
+    const max    = Math.max(...Object.values(totals));
+    const sorted = Object.entries(totals).sort((a, b) => b[1] - a[1]).slice(0, 8);
+
+    container.innerHTML = sorted.map(([sub, hrs], i) => `
+    <div class="subject-row">
+        <div class="subject-row-label" title="${Store.escapeHtml(sub)}">${Store.escapeHtml(sub)}</div>
+        <div class="subject-bar-track">
+            <div class="subject-bar-fill" style="width:${Math.round((hrs/max)*100)}%; background:${COLORS[i % COLORS.length]}"></div>
+        </div>
+        <div class="subject-row-value">${hrs.toFixed(1)}h</div>
+    </div>`).join('');
+}
+</script>
+</body>
+</html>
