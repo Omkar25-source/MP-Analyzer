@@ -5,7 +5,7 @@
 
 // Icons are initialized after DOM loads
 document.addEventListener('DOMContentLoaded', function () {
-    lucide.createIcons();
+    renderIcons();
     Store.hydrateSidebar();
     initDashboard();
 });
@@ -199,7 +199,7 @@ function createToast(title, message) {
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
     container.insertBefore(div, container.firstChild);
-    lucide.createIcons();
+    renderIcons();
 
     // Auto-dismiss after 4 s
     setTimeout(() => {

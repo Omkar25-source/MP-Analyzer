@@ -4,7 +4,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', function () {
-    lucide.createIcons();
+    renderIcons();
     Store.hydrateSidebar();
     initGoalsApp();
 });
@@ -229,5 +229,5 @@ function renderGoals() {
     // Restore emptyState display (outerHTML clone might differ)
     document.getElementById('emptyStateContainer').style.display = 'none';
 
-    lucide.createIcons();
+    renderIcons();
 }

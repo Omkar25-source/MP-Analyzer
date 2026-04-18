@@ -4,7 +4,7 @@
  * No external dependencies for CSV; uses jsPDF (CDN) for PDF.
  *
  * Usage (add script tag after store.js):
- *   <script src="../../assets/js/export.js"></script>
+ *   <script src="../../Assets/js/export.js"></script>
  */
 
 (function () {

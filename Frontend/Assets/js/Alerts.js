@@ -4,7 +4,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', function () {
-    lucide.createIcons();
+    renderIcons();
     Store.hydrateSidebar();
     initAlertsApp();
 });
@@ -177,7 +177,7 @@ function renderAlerts() {
     });
 
     container.innerHTML = html;
-    lucide.createIcons();
+    renderIcons();
 }
 
 /* ─── Push Notifications ───────────────────────────────────────── */
@@ -198,13 +198,13 @@ function initNotifications() {
             btn.classList.remove('btn-light');
             btn.classList.add('btn-success');
             btn.disabled = true;
-            lucide.createIcons();
+            renderIcons();
         } else {
             btn.innerHTML = `<i data-lucide="bell-off" size="18"></i><span class="d-none d-sm-inline">Enable Alerts</span>`;
             btn.classList.remove('btn-success');
             btn.classList.add('btn-light');
             btn.disabled = false;
-            lucide.createIcons();
+            renderIcons();
         }
     }
 
@@ -235,7 +235,7 @@ function fireUnreadNotifications() {
         setTimeout(() => {
             const n = new Notification(`StudySync — ${alert.title}`, {
                 body : alert.desc || 'You have an unread reminder.',
-                icon : '../../assets/img/icon.png', // graceful fallback if missing
+                icon : '../../Assets/img/icon.png', // graceful fallback if missing
                 tag  : `studysync-alert-${alert.id}`,
             });
             n.onclick = function () {

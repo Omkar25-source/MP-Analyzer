@@ -318,7 +318,12 @@ function hydrateSidebar() {
 
     if (nameEl)     nameEl.textContent     = user.name;
     if (initialsEl) initialsEl.textContent  = user.initials;
-    if (metaEl)     metaEl.textContent      = `Semester ${user.semester}, ${user.branch}`;
+    if (metaEl) {
+        const sem    = user.semester && user.semester !== 'undefined' ? `Sem ${user.semester}` : null;
+        const branch = user.branch   && user.branch   !== 'undefined' ? user.branch : null;
+        metaEl.textContent = (sem && branch) ? `${sem}, ${branch}`
+                           : (sem || branch || 'Set up your profile');
+    }
     if (welcomeEl)  welcomeEl.textContent   = user.name.split(' ')[0];
 }
 

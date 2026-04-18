@@ -5,7 +5,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', function () {
-    lucide.createIcons();
+    renderIcons();
     Store.hydrateSidebar();
     initPlannerApp();
 });
@@ -114,7 +114,7 @@ function renderTasks() {
                 <h5>Your planner is empty!</h5>
                 <p>Use the form on the left to add your first study task.</p>
             </div>`;
-        lucide.createIcons();
+        renderIcons();
         return;
     }
 
@@ -163,5 +163,5 @@ function renderTasks() {
     });
 
     container.innerHTML = html;
-    lucide.createIcons();
+    renderIcons();
 }

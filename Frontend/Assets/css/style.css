@@ -462,6 +462,23 @@ body {
     font-weight: 700;
 }
 
+/* Subject filter tabs */
+.subject-tab {
+    padding: 0.35rem 1rem;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s;
+}
+.subject-tab:hover  { border-color: var(--primary-color); color: var(--primary-color); background: var(--primary-light); }
+.subject-tab.active { background: var(--primary-color); color: #fff; border-color: var(--primary-color); }
+body.dark-mode .subject-tab { background: #334155; border-color: #475569; color: #94a3b8; }
+body.dark-mode .subject-tab.active { background: #6366f1; color: #fff; border-color: #6366f1; }
+
 .top-header,
 .page-content {
     background-color: #ffffff;
