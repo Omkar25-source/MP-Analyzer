@@ -1,6 +1,7 @@
 package com.MiniProject.Students.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class AttendanceRequest {
 
@@ -10,6 +11,7 @@ public class AttendanceRequest {
     @NotBlank(message = "Status is required")
     private String status;         // PRESENT | ABSENT | LATE
 
+    @NotNull(message = "Subject is required")
     private Long subjectId;
 
     public String getDate()               { return date; }

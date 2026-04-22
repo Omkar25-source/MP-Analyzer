@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -8,7 +8,7 @@
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@0.263.1/dist/umd/lucide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.1/dist/umd/lucide.min.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -21,6 +21,12 @@
             --text-muted: #64748b;
         }
 
+        :root[data-theme="dark"] {
+            --bg-color: #0f172a;
+            --text-dark: #f1f5f9;
+            --text-muted: #94a3b8;
+        }
+
         body, html {
             height: 100%;
             font-family: 'Inter', sans-serif;
@@ -29,12 +35,17 @@
             overflow: hidden;
         }
 
-        /* Animated Background — matches login page */
+        /* Animated Background - matches login page */
         .bg-shapes { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; background: #f8fafc; }
         .shape     { position: absolute; filter: blur(80px); opacity: 0.6; animation: float 10s infinite ease-in-out alternate; }
         .shape-1   { top: -10%; left: -10%; width: 500px; height: 500px; background: #e0e7ff; border-radius: 50%; }
         .shape-2   { bottom: -10%; right: -10%; width: 600px; height: 600px; background: #d1fae5; border-radius: 50%; animation-delay: -5s; }
         .shape-3   { top: 40%; left: 60%; width: 400px; height: 400px; background: #fef3c7; border-radius: 50%; animation-delay: -2s; }
+
+        :root[data-theme="dark"] .bg-shapes { background: #0b1220; }
+        :root[data-theme="dark"] .shape-1 { background: #312e81; opacity: 0.35; }
+        :root[data-theme="dark"] .shape-2 { background: #065f46; opacity: 0.3; }
+        :root[data-theme="dark"] .shape-3 { background: #7c2d12; opacity: 0.25; }
 
         @keyframes float {
             0%   { transform: translate(0, 0) scale(1); }
@@ -52,7 +63,7 @@
             overflow-y: auto;
         }
 
-        /* Glassmorphism card — matches login page */
+        /* Glassmorphism card - matches login page */
         .setup-card {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(12px);
@@ -64,6 +75,12 @@
             max-width: 520px;
             padding: 3rem 2.5rem;
             animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        :root[data-theme="dark"] .setup-card {
+            background: rgba(30, 41, 59, 0.88);
+            border: 1px solid rgba(71, 85, 105, 0.5);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.45);
         }
 
         @keyframes slideUp {
@@ -103,6 +120,34 @@
             border-radius: 12px;
             border: 1px solid #e2e8f0;
             background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        :root[data-theme="dark"] .form-control,
+        :root[data-theme="dark"] .form-select,
+        :root[data-theme="dark"] .add-subject-row input {
+            background-color: #1e293b;
+            border-color: #475569;
+            color: #e2e8f0;
+        }
+
+        :root[data-theme="dark"] .form-control::placeholder,
+        :root[data-theme="dark"] .add-subject-row input::placeholder {
+            color: #94a3b8;
+        }
+
+        :root[data-theme="dark"] .form-label,
+        :root[data-theme="dark"] .form-check-label {
+            color: #e2e8f0 !important;
+        }
+
+        :root[data-theme="dark"] .form-text,
+        :root[data-theme="dark"] .text-muted,
+        :root[data-theme="dark"] .setup-subtitle {
+            color: #cbd5e1 !important;
+        }
+
+        :root[data-theme="dark"] .invalid-feedback {
+            color: #fda4af;
         }
 
         .form-control:focus,
@@ -207,7 +252,7 @@
                 StudySync
             </div>
             <p class="setup-subtitle">Let's set up your profile before we begin.</p>
-            <div class="step-label">Step 1 of 1 — Profile Setup</div>
+            <div class="step-label">Step 1 of 1 - Profile Setup</div>
 
             <form id="profileForm" novalidate>
 
@@ -223,7 +268,7 @@
                     <div class="col-6">
                         <label class="form-label fw-medium" for="profileSemester">Semester</label>
                         <select class="form-select" id="profileSemester" required>
-                            <option value="" disabled selected>Select…</option>
+                            <option value="" disabled selected>Select...</option>
                             <option value="1">1st Semester</option>
                             <option value="2">2nd Semester</option>
                             <option value="3">3rd Semester</option>
@@ -256,10 +301,10 @@
                 <!-- Subjects -->
                 <div class="mb-4">
                     <label class="form-label fw-medium">Your Subjects</label>
-                    <div class="form-text mb-2">Add the subjects you study — these will populate all dropdowns.</div>
+                    <div class="form-text mb-2">Add the subjects you study - these will populate all dropdowns.</div>
                     <div class="subject-tags" id="subjectTags"></div>
                     <div class="add-subject-row">
-                        <input type="text" id="newSubjectInput" placeholder="Add a subject…" maxlength="60">
+                        <input type="text" id="newSubjectInput" placeholder="Add a subject..." maxlength="60">
                         <button type="button" class="btn btn-outline-primary btn-sm" id="addSubjectBtn">
                             <i data-lucide="plus" size="14"></i> Add
                         </button>
@@ -277,16 +322,18 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../Assets/js/theme.js"></script>
     <!-- Store (must load before profile logic) -->
     <script src="../../Assets/js/store.js"></script>
+    <script src="../../Assets/js/api.js"></script>
 
     <script>
-        renderIcons();
+        if (typeof lucide !== 'undefined') lucide.createIcons();
 
-        /* ── Default subjects ── */
+        /* -- Default subjects -- */
         let subjects = ['Computer Science', 'Mathematics', 'Physics', 'General'];
 
-        /* ── Pre-fill form if user profile already exists ── */
+        /* -- Pre-fill form if user profile already exists -- */
         (function prefill() {
             const user = Store.getUser();
             if (user && user.name && user.name !== 'Student') {
@@ -301,7 +348,7 @@
             renderTags();
         })();
 
-        /* ── Render subject tags ── */
+        /* -- Render subject tags -- */
         function renderTags() {
             const container = document.getElementById('subjectTags');
             if (subjects.length === 0) {
@@ -311,7 +358,7 @@
             container.innerHTML = subjects.map((s, i) => `
                 <span class="subject-tag">
                     ${escapeHtml(s)}
-                    <span class="remove-tag" data-index="${i}" title="Remove">×</span>
+                    <span class="remove-tag" data-index="${i}" title="Remove">-</span>
                 </span>
             `).join('');
 
@@ -331,7 +378,7 @@
                 .replace(/"/g, '&quot;');
         }
 
-        /* ── Add subject ── */
+        /* -- Add subject -- */
         function addSubject() {
             const input = document.getElementById('newSubjectInput');
             const val   = input.value.trim();
@@ -350,7 +397,7 @@
             if (e.key === 'Enter') { e.preventDefault(); addSubject(); }
         });
 
-        /* ── Form submit ── */
+        /* -- Form submit -- */
         document.getElementById('profileForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
@@ -384,10 +431,17 @@
                 subjects,
             });
 
-            // Redirect to dashboard
-            window.location.href = '../Dashboard/Dashboard.html';
+            // After setup, follow centralized post-login route logic.
+            if (typeof Api !== 'undefined' && typeof Api.markOnboardingSeen === 'function') {
+                Api.markOnboardingSeen();
+            }
+            window.location.href = (typeof Api !== 'undefined')
+                ? Api.getPostLoginPath()
+                : '../Dashboard/Dashboard.html';
         });
     </script>
 </body>
 
 </html>
+
+

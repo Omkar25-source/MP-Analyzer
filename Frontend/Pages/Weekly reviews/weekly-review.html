@@ -1,22 +1,22 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StudySync - Weekly Review</title>
-    <meta name="description" content="Reflect on your week — study hours, attendance, goals, and personal insights.">
+    <meta name="description" content="Reflect on your week - study hours, attendance, goals, and personal insights.">
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@0.263.1/dist/umd/lucide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.1/dist/umd/lucide.min.js"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../../Assets/css/style.css">
 
     <style>
-        /* ── Weekly Review specific styles ── */
+        /* -- Weekly Review specific styles -- */
         .week-nav-btn {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
@@ -216,7 +216,7 @@
             <!-- Page Header -->
             <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
                 <div>
-                    <h2 class="fw-bold mb-1">Weekly Review 📋</h2>
+                    <h2 class="fw-bold mb-1">Weekly Review</h2>
                     <p class="text-muted mb-0">Reflect on your week and plan for the next one.</p>
                 </div>
                 <!-- Week navigation -->
@@ -224,7 +224,7 @@
                     <button class="week-nav-btn" id="prevWeekBtn">
                         <i data-lucide="chevron-left" size="14"></i> Prev
                     </button>
-                    <span class="week-label" id="weekLabel">—</span>
+                    <span class="week-label" id="weekLabel">-</span>
                     <button class="week-nav-btn" id="nextWeekBtn">
                         Next <i data-lucide="chevron-right" size="14"></i>
                     </button>
@@ -233,7 +233,7 @@
 
             <div class="row g-4">
 
-                <!-- ── Left column: Stats & charts ── -->
+                <!-- -- Left column: Stats & charts -- -->
                 <div class="col-lg-7">
 
                     <!-- Stats summary row -->
@@ -289,7 +289,7 @@
                     </div>
                 </div>
 
-                <!-- ── Right column: Reflection + history ── -->
+                <!-- -- Right column: Reflection + history -- -->
                 <div class="col-lg-5">
 
                     <!-- Mood tracker -->
@@ -300,11 +300,11 @@
                         </h5>
                         <p class="text-muted small mb-2">How did this week feel overall?</p>
                         <div class="mood-stars" id="moodStars">
-                            <span class="mood-star" data-rating="1" title="Terrible">😞</span>
-                            <span class="mood-star" data-rating="2" title="Bad">😕</span>
-                            <span class="mood-star" data-rating="3" title="Okay">😐</span>
-                            <span class="mood-star" data-rating="4" title="Good">🙂</span>
-                            <span class="mood-star" data-rating="5" title="Great">😄</span>
+                            <span class="mood-star" data-rating="1" title="Terrible">:(</span>
+                            <span class="mood-star" data-rating="2" title="Bad">:/</span>
+                            <span class="mood-star" data-rating="3" title="Okay">:|</span>
+                            <span class="mood-star" data-rating="4" title="Good">:)</span>
+                            <span class="mood-star" data-rating="5" title="Great">:D</span>
                         </div>
                         <div class="text-muted small mt-2" id="moodLabel">Click a mood to rate your week</div>
                     </div>
@@ -317,7 +317,7 @@
                         </h5>
                         <p class="text-muted small mb-2">What went well? What can you improve?</p>
                         <textarea id="reflectionNotes" class="w-100"
-                            placeholder="e.g. Completed all my DS assignments on time. Need to revise Maths more next week…"></textarea>
+                            placeholder="e.g. Completed all my DS assignments on time. Need to revise Maths more next week..."></textarea>
                         <button class="btn btn-primary w-100 mt-3 fw-bold d-flex align-items-center justify-content-center gap-2"
                             id="saveReviewBtn">
                             <i data-lucide="save" size="16"></i> Save This Review
@@ -347,11 +347,11 @@
     <script src="../../Assets/js/api.js"></script>
 
     <script>
-        /* ────────────────────────────────────────────────────────────
-           Weekly Review — StudySync
+        /* ------------------------------------------------------------
+           Weekly Review - StudySync
            Reads from Store (localStorage). Saves review objects under
            the key 'ss_weekly_reviews' (array, newest first).
-        ──────────────────────────────────────────────────────────── */
+        ------------------------------------------------------------ */
 
         document.addEventListener('DOMContentLoaded', function () {
             renderIcons();
@@ -359,7 +359,7 @@
             initWeeklyReview();
         });
 
-        // ── Week navigation state ──────────────────────────────────
+        // -- Week navigation state ----------------------------------
         let weekOffset = 0; // 0 = current week, -1 = last week, etc.
 
         function getWeekBounds(offset) {
@@ -382,7 +382,7 @@
             return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         }
 
-        // ── Reviews storage ────────────────────────────────────────
+        // -- Reviews storage ----------------------------------------
         const REVIEWS_KEY = 'ss_weekly_reviews';
 
         function getReviews() {
@@ -404,20 +404,20 @@
             saveReviews(reviews);
         }
 
-        // ── Current mood selection ─────────────────────────────────
+        // -- Current mood selection ---------------------------------
         let selectedMood = 0;
 
         function setMood(rating) {
             selectedMood = rating;
             const stars = document.querySelectorAll('.mood-star');
-            const labels = ['', 'Terrible 😞', 'Bad 😕', 'Okay 😐', 'Good 🙂', 'Great! 😄'];
+            const labels = ['', 'Terrible :(', 'Bad :/', 'Okay :|', 'Good :)', 'Great! :D'];
             stars.forEach(s => {
                 s.classList.toggle('active', parseInt(s.dataset.rating) <= rating);
             });
             document.getElementById('moodLabel').textContent = labels[rating] || 'Click a mood to rate your week';
         }
 
-        // ── Render for a given weekOffset ─────────────────────────
+        // -- Render for a given weekOffset -------------------------
         function renderWeek() {
             const { monday, sunday } = getWeekBounds(weekOffset);
             const mondayStr = toYMD(monday);
@@ -425,12 +425,12 @@
 
             // Week label
             document.getElementById('weekLabel').textContent =
-                `${formatDateShort(monday)} – ${formatDateShort(sunday)}`;
+                `${formatDateShort(monday)} - ${formatDateShort(sunday)}`;
 
             // Disable next button if current week
             document.getElementById('nextWeekBtn').disabled = weekOffset >= 0;
 
-            // ── Compute stats from Store ───────────────────────────
+            // -- Compute stats from Store ---------------------------
             const logs       = Store.getStudyLogs();
             const attendance = Store.getAttendance();
             const goals      = Store.getGoals();
@@ -445,7 +445,7 @@
             const present = weekAtt.filter(a => a.status === 'present' || a.status === 'late').length;
             const attPct  = weekAtt.length > 0 ? Math.round((present / weekAtt.length) * 100) : 0;
 
-            // Goals completed (overall completed count — goals don't have dates easily)
+            // Goals completed (overall completed count - goals don't have dates easily)
             const goalsCompleted = goals.filter(g => g.current >= g.target).length;
 
             // Tasks completed this week (by due date)
@@ -459,7 +459,7 @@
             document.getElementById('wr-goals').textContent      = goalsCompleted;
             document.getElementById('wr-tasks').textContent      = weekTasksDone;
 
-            // ── Bar chart: daily hours ─────────────────────────────
+            // -- Bar chart: daily hours -----------------------------
             const days   = [];
             const hours  = [];
             const colors = [];
@@ -501,7 +501,7 @@
                 });
             }
 
-            // ── Auto insights ──────────────────────────────────────
+            // -- Auto insights --------------------------------------
             const insights = buildInsights(totalHours, attPct, goalsCompleted, weekTasksDone, weekLogs, weekAtt);
             const container = document.getElementById('insightsContainer');
             if (insights.length === 0) {
@@ -512,14 +512,14 @@
                 ).join('');
             }
 
-            // ── Load saved review if exists ────────────────────────
+            // -- Load saved review if exists ------------------------
             const saved = getReviewForWeek(mondayStr);
             selectedMood = saved ? (saved.mood || 0) : 0;
             setMood(selectedMood);
             document.getElementById('reflectionNotes').value = saved ? (saved.notes || '') : '';
         }
 
-        // ── Build insight chips ────────────────────────────────────
+        // -- Build insight chips ------------------------------------
         function buildInsights(hours, attPct, goalsCompleted, tasksDone, weekLogs, weekAtt) {
             const ins = [];
             const user = Store.getUser();
@@ -528,50 +528,50 @@
             if (weekLogs.length === 0 && weekAtt.length === 0) return ins;
 
             if (hours >= target) {
-                ins.push({ cls: 'good', text: '🎯 Met weekly study target!' });
+                ins.push({ cls: 'good', text: 'Met weekly study target!' });
             } else if (hours > 0) {
                 const pct = Math.round((hours / target) * 100);
-                ins.push({ cls: 'warn', text: `📚 ${pct}% of study target done` });
+                ins.push({ cls: 'warn', text: `${pct}% of study target done` });
             } else {
-                ins.push({ cls: 'bad', text: '⚠️ No study hours logged' });
+                ins.push({ cls: 'bad', text: 'No study hours logged' });
             }
 
             if (attPct >= 90) {
-                ins.push({ cls: 'good', text: '✅ Excellent attendance (≥90%)' });
+                ins.push({ cls: 'good', text: 'Excellent attendance (>=90%)' });
             } else if (attPct >= 75) {
-                ins.push({ cls: 'good', text: `📅 Good attendance (${attPct}%)` });
+                ins.push({ cls: 'good', text: `Good attendance (${attPct}%)` });
             } else if (attPct > 0) {
-                ins.push({ cls: 'bad', text: `⚠️ Low attendance (${attPct}%)` });
+                ins.push({ cls: 'bad', text: `Low attendance (${attPct}%)` });
             }
 
             // Study streak
             const streak = Store.calculateStreak();
             if (streak >= 7) {
-                ins.push({ cls: 'good', text: `🔥 ${streak}-day study streak!` });
+                ins.push({ cls: 'good', text: `${streak}-day study streak!` });
             } else if (streak >= 3) {
-                ins.push({ cls: 'info', text: `🔥 ${streak}-day streak — keep it up` });
+                ins.push({ cls: 'info', text: `${streak}-day streak - keep it up` });
             }
 
             if (goalsCompleted > 0) {
-                ins.push({ cls: 'good', text: `🏆 ${goalsCompleted} goal${goalsCompleted > 1 ? 's' : ''} completed` });
+                ins.push({ cls: 'good', text: `${goalsCompleted} goal${goalsCompleted > 1 ? 's' : ''} completed` });
             }
 
             if (tasksDone > 0) {
-                ins.push({ cls: 'info', text: `✔️ ${tasksDone} task${tasksDone > 1 ? 's' : ''} completed this week` });
+                ins.push({ cls: 'info', text: `${tasksDone} task${tasksDone > 1 ? 's' : ''} completed this week` });
             }
 
             // Study days count
             const studyDays = new Set(weekLogs.map(l => l.date)).size;
             if (studyDays === 7) {
-                ins.push({ cls: 'good', text: '⭐ Studied all 7 days!' });
+                ins.push({ cls: 'good', text: 'Studied all 7 days!' });
             } else if (studyDays <= 2 && weekLogs.length > 0) {
-                ins.push({ cls: 'warn', text: `📆 Only studied ${studyDays} day${studyDays > 1 ? 's' : ''} — try spreading it out` });
+                ins.push({ cls: 'warn', text: `Only studied ${studyDays} day${studyDays > 1 ? 's' : ''} - try spreading it out` });
             }
 
             return ins;
         }
 
-        // ── Render past reviews list ───────────────────────────────
+        // -- Render past reviews list -------------------------------
         function renderHistory() {
             const list    = getReviews();
             const el      = document.getElementById('reviewHistory');
@@ -580,7 +580,7 @@
                 return;
             }
 
-            const moodEmojis = ['', '😞', '😕', '😐', '🙂', '😄'];
+            const moodEmojis = ['', ':(', ':/', ':|', ':)', ':D'];
             el.innerHTML = list.slice(0, 8).map(r => {
                 const start = new Date(r.weekStart + 'T00:00:00');
                 const end   = new Date(start);
@@ -589,14 +589,14 @@
                 <div class="review-history-item" data-week="${Store.escapeHtml(r.weekStart)}">
                     <div>
                         <div class="fw-semibold" style="font-size:0.85rem;">
-                            ${formatDateShort(start)} – ${formatDateShort(end)}
+                            ${formatDateShort(start)} - ${formatDateShort(end)}
                         </div>
                         <div class="text-muted" style="font-size:0.75rem;">
-                            ${r.studyHours?.toFixed(1) || 0}h studied · ${r.attendance || 0}% attendance
+                            ${r.studyHours?.toFixed(1) || 0}h studied - ${r.attendance || 0}% attendance
                         </div>
                     </div>
                     <div class="d-flex align-items-center gap-2">
-                        <span style="font-size:1.3rem;">${moodEmojis[r.mood || 0] || '—'}</span>
+                        <span style="font-size:1.3rem;">${moodEmojis[r.mood || 0] || '-'}</span>
                     </div>
                 </div>`;
             }).join('');
@@ -615,7 +615,7 @@
             });
         }
 
-        // ── Save review ────────────────────────────────────────────
+        // -- Save review --------------------------------------------
         function saveCurrentReview() {
             const { monday, sunday } = getWeekBounds(weekOffset);
             const mondayStr = toYMD(monday);
@@ -640,7 +640,7 @@
 
             // Button feedback
             const btn = document.getElementById('saveReviewBtn');
-            btn.textContent = '✓ Saved!';
+            btn.textContent = '? Saved!';
             btn.classList.add('save-btn-saved');
             setTimeout(() => {
                 btn.innerHTML = '<i data-lucide="save" size="16"></i> Save This Review';
@@ -651,7 +651,7 @@
             renderHistory();
         }
 
-        // ── Init ───────────────────────────────────────────────────
+        // -- Init ---------------------------------------------------
         function initWeeklyReview() {
             // Week navigation
             document.getElementById('prevWeekBtn').addEventListener('click', () => {
@@ -686,3 +686,5 @@
 </body>
 
 </html>
+
+

@@ -69,8 +69,12 @@ function saveUser(userData) {
     _write(KEYS.user, userData);
 }
 
-/* ─── Study Logs ───────────────────────────────────────────────── */
+/* ─── Study Logs (compat layer) ─────────────────────────────────── */
 
+/**
+ * Kept for backward compatibility with pages that still read local logs
+ * (Achievements, Analytics, Weekly Review).
+ */
 function getStudyLogs() {
     return _read(KEYS.studyLogs, []);
 }
@@ -205,17 +209,13 @@ function deleteAlertById(id) {
 /* ─── Analytics Helpers ─────────────────────────────────────────── */
 
 /**
- * Calculate the current consecutive study-day streak.
- * Counts backward from today: how many continuous days (with ≥1 study log)
- * exist without a gap?
+ * Calculate consecutive study-day streak using local logs.
  */
 function calculateStreak() {
     const logs = getStudyLogs();
     if (logs.length === 0) return 0;
 
-    // Collect unique study dates as YYYY-MM-DD strings
     const studiedDates = new Set(logs.map(l => l.date));
-
     let streak = 0;
     const today = new Date();
 
@@ -227,11 +227,8 @@ function calculateStreak() {
         if (studiedDates.has(dateStr)) {
             streak++;
         } else {
-            // Allow today to be unlogged (check started from today)
-            // If we haven't started counting yet (streak === 0) and it's
-            // today that's missing, skip today and try yesterday.
             if (i === 0) continue;
-            break; // gap in streak — stop
+            break;
         }
     }
 
@@ -239,8 +236,7 @@ function calculateStreak() {
 }
 
 /**
- * Calculate weighted performance score (0–100).
- * Weights: attendance 60%, daily study progress 40%.
+ * Weighted score: study progress (40%) + attendance (60%).
  */
 function calculatePerformanceScore() {
     const todayStr = new Date().toISOString().split('T')[0];
@@ -262,10 +258,19 @@ function calculatePerformanceScore() {
         ? (presentDays / totalDays) * 100
         : 0;
 
-    // Weighted blend; if no data at all, return 0 (not 50)
     if (logs.length === 0 && attendance.length === 0) return 0;
 
     return Math.min(100, Math.round((studyProgress * 0.4) + (attPerc * 0.6)));
+}
+
+/**
+ * Get today's total study hours from local logs.
+ */
+function getTodayStudyHours() {
+    const todayStr = new Date().toISOString().split('T')[0];
+    return getStudyLogs()
+        .filter(l => l.date === todayStr)
+        .reduce((sum, l) => sum + l.hours, 0);
 }
 
 /**
@@ -276,16 +281,6 @@ function calculateAttendancePercent() {
     if (records.length === 0) return 0;
     const present = records.filter(r => r.status === 'present' || r.status === 'late').length;
     return Math.round((present / records.length) * 100);
-}
-
-/**
- * Get today's total study hours.
- */
-function getTodayStudyHours() {
-    const todayStr = new Date().toISOString().split('T')[0];
-    return getStudyLogs()
-        .filter(l => l.date === todayStr)
-        .reduce((sum, l) => sum + l.hours, 0);
 }
 
 /**
@@ -316,15 +311,33 @@ function hydrateSidebar() {
     const metaEl     = document.getElementById('user-meta');
     const welcomeEl  = document.getElementById('welcome-name');
 
-    if (nameEl)     nameEl.textContent     = user.name;
-    if (initialsEl) initialsEl.textContent  = user.initials;
-    if (metaEl) {
-        const sem    = user.semester && user.semester !== 'undefined' ? `Sem ${user.semester}` : null;
-        const branch = user.branch   && user.branch   !== 'undefined' ? user.branch : null;
-        metaEl.textContent = (sem && branch) ? `${sem}, ${branch}`
-                           : (sem || branch || 'Set up your profile');
+    function _fill(u) {
+        if (nameEl)     nameEl.textContent    = u.name;
+        if (initialsEl) initialsEl.textContent = u.initials || (u.name || 'S')[0].toUpperCase();
+        if (metaEl) {
+            const sem    = u.semester && u.semester !== 'undefined' ? `Sem ${u.semester}` : null;
+            const branch = u.branch   && u.branch   !== 'undefined' ? u.branch : null;
+            metaEl.textContent = (sem && branch) ? `${sem}, ${branch}`
+                               : (sem || branch || 'Set up your profile');
+        }
+        if (welcomeEl) welcomeEl.textContent = (u.name || 'Student').split(' ')[0];
     }
-    if (welcomeEl)  welcomeEl.textContent   = user.name.split(' ')[0];
+
+    // 1. Render immediately from localStorage (no flicker)
+    _fill(user);
+
+    // 2. Refresh from backend if JWT available
+    if (typeof Api !== 'undefined' && Api.getToken()) {
+        Api.getMe().then(function (serverUser) {
+            const merged = { ...user, name: serverUser.name || user.name,
+                semester: serverUser.semester || user.semester,
+                branch: serverUser.branch || user.branch };
+            const parts = (merged.name || 'S').trim().split(/\s+/);
+            merged.initials = parts.map(p => p[0].toUpperCase()).slice(0, 2).join('');
+            saveUser(merged);
+            _fill(merged);
+        }).catch(function () { /* backend offline, local values stay */ });
+    }
 }
 
 /* ─── Export (global namespace, no bundler needed) ─────────────── */

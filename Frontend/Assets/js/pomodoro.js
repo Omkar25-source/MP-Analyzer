@@ -30,7 +30,34 @@
     let remaining      = totalSeconds;
     let timerInterval  = null;
     let running        = false;
-    let isOpen         = true;
+    let isOpen         = false;
+
+    const STATE_KEY = 'ss_pomo_state';
+
+    function saveState() {
+        localStorage.setItem(STATE_KEY, JSON.stringify({
+            phase, totalSeconds, remaining, pomosCompleted, running,
+            savedAt: Date.now()
+        }));
+    }
+
+    function restoreState() {
+        try {
+            const raw = localStorage.getItem(STATE_KEY);
+            if (!raw) return;
+            const s = JSON.parse(raw);
+            phase          = s.phase          || 'work';
+            totalSeconds   = s.totalSeconds   || WORK_MINS * 60;
+            pomosCompleted = s.pomosCompleted  || 0;
+            // If it was running, subtract elapsed real seconds
+            let adj = s.remaining || WORK_MINS * 60;
+            if (s.running && s.savedAt) {
+                const elapsed = Math.floor((Date.now() - s.savedAt) / 1000);
+                adj = Math.max(0, adj - elapsed);
+            }
+            remaining = adj;
+        } catch (_) { /* corrupt state — use defaults */ }
+    }
 
     /* ── Inject CSS ─────────────────────────────────────────────── */
     function injectCSS() {
@@ -78,6 +105,7 @@
         }
         #pomo-fab-dot.running { background: #4ade80; animation: pomo-pulse 1.2s ease-in-out infinite; }
         #pomo-fab-dot.break   { background: #34d399; }
+        #pomo-fab i[data-lucide] { width: 16px; height: 16px; }
         @keyframes pomo-pulse {
             0%,100% { opacity: 1; transform: scale(1); }
             50%      { opacity: 0.6; transform: scale(0.75); }
@@ -228,6 +256,10 @@
             cursor: pointer;
             font-family: 'Inter', sans-serif;
             transition: opacity 0.15s, transform 0.15s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
         #pomo-start-btn:hover { opacity: 0.88; transform: translateY(-1px); }
         #pomo-start-btn.paused {
@@ -246,8 +278,16 @@
             cursor: pointer;
             font-family: 'Inter', sans-serif;
             transition: background 0.15s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
         #pomo-reset-btn:hover { background: #e2e8f0; }
+        #pomo-start-btn i[data-lucide],
+        #pomo-reset-btn i[data-lucide] {
+            width: 14px;
+            height: 14px;
+        }
 
         /* Footer row */
         #pomo-footer {
@@ -303,6 +343,7 @@
 
     /* ── Build Widget DOM ───────────────────────────────────────── */
     function buildWidget() {
+        restoreState();   // ← restore before building so display is correct
         injectCSS();
 
         // ── FAB (always-visible pill) ──────────────────────── //
@@ -310,11 +351,7 @@
         fab.id        = 'pomo-fab';
         fab.title     = 'Pomodoro Timer';
         fab.innerHTML = `
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="12 6 12 12 16 14"/>
-            </svg>
+            <i data-lucide="timer-reset"></i>
             <span id="pomo-fab-timer">25:00</span>
             <span id="pomo-fab-dot"></span>
         `;
@@ -348,8 +385,8 @@
                 </div>
 
                 <div class="pomo-controls">
-                    <button id="pomo-start-btn">▶&nbsp; Start</button>
-                    <button id="pomo-reset-btn" title="Reset">↺</button>
+                    <button id="pomo-start-btn"><i data-lucide="play"></i><span>Start</span></button>
+                    <button id="pomo-reset-btn" title="Reset"><i data-lucide="rotate-ccw"></i></button>
                 </div>
 
                 <div id="pomo-footer">
@@ -362,7 +399,6 @@
 
         // Wire up FAB toggle
         fab.addEventListener('click', function (e) {
-            // Don't toggle when dragging
             if (fab._wasDragged) { fab._wasDragged = false; return; }
             togglePanel();
         });
@@ -371,14 +407,41 @@
         widget.querySelector('#pomo-start-btn').addEventListener('click', toggleTimer);
         widget.querySelector('#pomo-reset-btn').addEventListener('click', resetTimer);
 
+        // Close panel when user clicks outside.
+        document.addEventListener('click', function (e) {
+            if (!isOpen) return;
+            const inWidget = widget.contains(e.target);
+            const inFab = fab.contains(e.target);
+            if (!inWidget && !inFab) {
+                togglePanel(false);
+            }
+        });
+
+        // Escape key closes panel.
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && isOpen) {
+                togglePanel(false);
+            }
+        });
+
         // Drag FAB
         makeDraggable(fab, fab);
 
         // Populate subject suggestions
         populateSubjectInput(widget.querySelector('#pomo-subject'));
 
+        // Restore session count display
+        document.getElementById('pomo-num').textContent = pomosCompleted;
+
         // Initial display
         updateDisplay();
+        if (typeof window.renderIcons === 'function') window.renderIcons();
+
+        // Auto-resume if timer was running when user navigated away
+        const saved = JSON.parse(localStorage.getItem(STATE_KEY) || 'null');
+        if (saved && saved.running && remaining > 0) {
+            startTimer();
+        }
 
         // Start hidden (panel closed, FAB visible)
         widget.classList.add('hidden');
@@ -386,8 +449,8 @@
     }
 
     /* ── Toggle panel open/closed ──────────────────────────────── */
-    function togglePanel() {
-        isOpen = !isOpen;
+    function togglePanel(forceState = null) {
+        isOpen = forceState === null ? !isOpen : !!forceState;
         document.getElementById('pomo-widget').classList.toggle('hidden', !isOpen);
     }
 
@@ -421,6 +484,7 @@
     function startTimer() {
         if (timerInterval) return;
         running = true;
+        saveState();
         timerInterval = setInterval(tick, 1000);
         updateButtons();
     }
@@ -429,20 +493,25 @@
         clearInterval(timerInterval);
         timerInterval = null;
         running = false;
+        saveState();
         updateButtons();
     }
 
     function resetTimer() {
         pauseTimer();
-        phase        = 'work';
-        remaining    = WORK_MINS * 60;
-        totalSeconds = remaining;
+        phase          = 'work';
+        remaining      = WORK_MINS * 60;
+        totalSeconds   = remaining;
+        pomosCompleted = 0;
+        localStorage.removeItem(STATE_KEY);
+        document.getElementById('pomo-num').textContent = 0;
         updateDisplay();
         updateButtons();
     }
 
     function tick() {
         remaining--;
+        saveState();
         if (remaining <= 0) {
             phaseComplete();
         } else {
@@ -468,25 +537,30 @@
         }
 
         totalSeconds = remaining;
+        saveState();
         updateDisplay();
         startTimer(); // auto-advance
     }
 
     /* ── Auto-log ──────────────────────────────────────────────── */
-    function autoLog() {
-        if (typeof Store === 'undefined') return;
+    async function autoLog() {
+        if (typeof Api === 'undefined') return;
         try {
-            const subjectEl = document.getElementById('pomo-subject');
-            const subject   = (subjectEl && subjectEl.value.trim()) || 'General';
-            Store.addStudyLog({
-                id     : Date.now(),
-                subject,
-                hours  : parseFloat((WORK_MINS / 60).toFixed(2)),
-                date   : new Date().toISOString().split('T')[0],
-                source : 'pomodoro',
-            });
+            const subjectEl   = document.getElementById('pomo-subject');
+            const subjectName = (subjectEl && subjectEl.value.trim()) || 'General';
+            const date        = new Date().toISOString().split('T')[0];
+
+            // Resolve or create the subject on the backend
+            const subjects = await Api.getSubjects().catch(() => []);
+            let match = subjects.find(s => s.name === subjectName);
+            if (!match) {
+                match = await Api.createSubject(subjectName).catch(() => null);
+            }
+            if (!match) return; // can't log without a valid subject
+
+            await Api.logStudySession(match.id, WORK_MINS, date, 'pomodoro');
             showToast();
-        } catch (_) {}
+        } catch (_) { /* silent — timer should never break on log failure */ }
     }
 
     function showToast() {
@@ -547,13 +621,17 @@
         if (!btn) return;
         const isBreak = phase !== 'work';
         if (running) {
-            btn.textContent = '⏸\u00a0 Pause';
+            btn.innerHTML = '<i data-lucide="pause"></i><span>Pause</span>';
             btn.className   = isBreak ? 'break-mode' : '';
         } else {
             const resumed = remaining < totalSeconds;
-            btn.textContent = resumed ? '▶\u00a0 Resume' : '▶\u00a0 Start';
+            btn.innerHTML = resumed
+                ? '<i data-lucide="play"></i><span>Resume</span>'
+                : '<i data-lucide="play"></i><span>Start</span>';
             btn.className   = '';
         }
+
+        if (typeof window.renderIcons === 'function') window.renderIcons();
     }
 
     /* ── Beep ──────────────────────────────────────────────────── */

@@ -83,6 +83,26 @@ public class AttendanceController {
         return ResponseEntity.ok(records.stream().map(this::toMap).toList());
     }
 
+    /**
+     * DELETE /api/attendance/{id}
+     * Deletes one attendance record belonging to the logged-in user.
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteAttendance(@PathVariable Long id,
+                                              Authentication auth) {
+        User user = resolveUser(auth);
+
+        AttendanceRecord record = attendanceRepository.findByIdAndUser(id, user)
+                .orElse(null);
+
+        if (record == null) {
+            return ResponseEntity.status(404).body(Map.of("error", "Attendance record not found"));
+        }
+
+        attendanceRepository.delete(record);
+        return ResponseEntity.ok(Map.of("message", "Attendance deleted"));
+    }
+
     /* ── helpers ── */
 
     private User resolveUser(Authentication auth) {

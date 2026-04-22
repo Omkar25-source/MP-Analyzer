@@ -42,14 +42,20 @@
     }
 
     /* ── Study Logs CSV ──────────────────────────────────────────── */
-    function exportStudyLogsCSV() {
-        const logs = Store.getStudyLogs();
-        if (logs.length === 0) { alert('No study logs to export yet.'); return; }
+    async function exportStudyLogsCSV() {
+        let sessions = [];
+        try {
+            sessions = await Api.getDailySessions();
+        } catch (e) {
+            alert('Could not fetch study sessions from server.');
+            return;
+        }
+        if (sessions.length === 0) { alert('No study sessions to export yet.'); return; }
 
-        const headers = ['Date', 'Subject', 'Hours', 'Source'];
-        const rows    = logs
+        const headers = ['Date', 'Subject', 'Duration (min)', 'Notes'];
+        const rows    = sessions
             .sort((a, b) => a.date.localeCompare(b.date))
-            .map(l => [l.date, l.subject, l.hours, l.source || 'manual']);
+            .map(s => [s.date, s.subjectName, s.durationMinutes, s.notes || '']);
 
         downloadCSV(headers, rows, `StudySync_StudyLogs_${today()}.csv`);
     }
@@ -110,17 +116,26 @@
         }
     }
 
-    function _generatePDF() {
+    async function _generatePDF() {
         const jsPDF  = window.jspdf?.jsPDF || window.jsPDF;
         const doc    = new jsPDF();
         const user   = Store.getUser();
-        const logs   = Store.getStudyLogs();
         const att    = Store.getAttendance();
         const goals  = Store.getGoals();
-        const streak = Store.calculateStreak();
         const attPct = Store.calculateAttendancePercent();
-        const perf   = Store.calculatePerformanceScore();
-        const todayH = Store.getTodayStudyHours();
+
+        // Fetch study stats from backend
+        let streak = 0, todayMinutes = 0, weekMinutes = 0, breakdown = [];
+        try {
+            const stats = await Api.getDashboardStats();
+            streak       = stats.streak || 0;
+            todayMinutes = stats.todayMinutes || 0;
+            weekMinutes  = stats.weekMinutes  || 0;
+            breakdown    = stats.subjectBreakdown || [];
+        } catch (e) { /* proceed with zeros */ }
+
+        const todayH = (todayMinutes / 60).toFixed(1);
+        const perf   = attPct;  // attendance-based performance
 
         let y = 20;
         const LINE = 8;

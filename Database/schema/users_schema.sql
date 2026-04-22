@@ -24,3 +24,21 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- Option B: hard reset for dev (IRREVERSIBLE)
 -- TRUNCATE TABLE users;
+
+-- ──────────────────────────────────────────────────────────────────────────────
+-- Study Sessions (Phase 1 migration)
+-- Hibernate will auto-create this via ddl-auto=update.
+-- Run manually only if you need the index before the first boot.
+-- ──────────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS study_sessions (
+    id                BIGINT       NOT NULL AUTO_INCREMENT,
+    user_id           BIGINT       NOT NULL,
+    subject_id        BIGINT       NOT NULL,
+    duration_minutes  INT          NOT NULL,
+    date              DATE         NOT NULL,
+    notes             VARCHAR(500),
+    PRIMARY KEY (id),
+    CONSTRAINT fk_ss_user    FOREIGN KEY (user_id)    REFERENCES users(id)    ON DELETE CASCADE,
+    CONSTRAINT fk_ss_subject FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
+    INDEX idx_study_user_date (user_id, date)
+);

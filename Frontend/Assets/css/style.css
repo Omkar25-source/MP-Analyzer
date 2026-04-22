@@ -76,6 +76,12 @@ body {
     cursor: pointer;
 }
 
+.nav-item i[data-lucide] {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
 .nav-item:hover {
     background-color: #f1f5f9;
     color: var(--text-dark);
@@ -162,6 +168,26 @@ body {
     align-items: center;
     justify-content: center;
     margin-bottom: 1rem;
+}
+
+.icon-box i[data-lucide] {
+    width: 20px;
+    height: 20px;
+}
+
+.custom-card i[data-lucide] {
+    vertical-align: middle;
+}
+
+.custom-card .d-flex.justify-content-between > i[data-lucide] {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.sidebar-brand .icon-container i[data-lucide] {
+    width: 18px;
+    height: 18px;
 }
 
 .icon-box.purple {
@@ -568,7 +594,15 @@ body.dark-mode .subject-tab.active { background: #6366f1; color: #fff; border-co
 
 /* ══════════════════════════════════════════════════════════════════
    DARK MODE — applied when body.dark-mode is set by theme.js
+   [data-theme=dark] on <html> is set IMMEDIATELY (before body paint)
+   to prevent FOUC. body.dark-mode is applied on DOMContentLoaded.
 ════════════════════════════════════════════════════════════════════ */
+
+/* Instant FOUC-prevention rules keyed on html attribute */
+:root[data-theme=dark] body { background-color: #0f172a; color: #e2e8f0; }
+:root[data-theme=dark] .sidebar { background-color: #1e293b; border-right-color: #334155; }
+:root[data-theme=dark] .main-content { background-color: #0f172a; }
+:root[data-theme=dark] .custom-card { background-color: #1e293b; }
 
 body.dark-mode {
     background-color: #0f172a;
@@ -751,4 +785,35 @@ body.dark-mode .theme-toggle-btn:hover {
     background: #4f46e5;
     color: white;
     border-color: #4f46e5;
-}
+}
+
+/* ── Attendance table — Bootstrap overrides for dark mode ───── */
+body.dark-mode .table { color: #e2e8f0; }
+body.dark-mode .table > :not(caption) > * > * {
+    background-color: transparent;
+    color: #e2e8f0;
+    border-bottom-color: #334155;
+}
+body.dark-mode .table-hover > tbody > tr:hover > * {
+    background-color: #1e293b;
+    color: #f1f5f9;
+}
+body.dark-mode .table-responsive { background: transparent; }
+body.dark-mode tbody, body.dark-mode thead { background-color: transparent; }
+
+/* ── Profile-edit card ────────────────────────────────────────── */
+body.dark-mode .profile-card {
+    background: #1e293b !important;
+    color: #e2e8f0;
+}
+body.dark-mode .profile-card .section-label { color: #94a3b8; }
+body.dark-mode .profile-card .form-label    { color: #cbd5e1; }
+body.dark-mode .profile-card h5,
+body.dark-mode .profile-card .btn-back      { color: #e2e8f0; }
+body.dark-mode .profile-card hr             { border-color: #334155; }
+body.dark-mode .provider-badge {
+    background: #312e81;
+    color: #a5b4fc;
+}
+body.dark-mode .avatar-circle { background: #6366f1; }
+

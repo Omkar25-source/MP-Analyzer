@@ -31,14 +31,15 @@
 
     /* ── Helpers ─────────────────────────────────────────────────── */
     function getTheme() {
-        return localStorage.getItem(THEME_KEY) || 'light';
+        return localStorage.getItem(THEME_KEY) || 'dark';
     }
 
     function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
         if (theme === 'dark') {
-            document.body.classList.add('dark-mode');
+            document.body && document.body.classList.add('dark-mode');
         } else {
-            document.body.classList.remove('dark-mode');
+            document.body && document.body.classList.remove('dark-mode');
         }
         updateBtn(theme);
     }
@@ -75,6 +76,13 @@
         footer.appendChild(btn);
         updateBtn(getTheme());
     }
+
+    /* ── Apply immediately (before DOMContentLoaded) to prevent FOUC ── */
+    (function () {
+        const t = localStorage.getItem(THEME_KEY) || 'dark';
+        document.documentElement.setAttribute('data-theme', t);
+        // body may not exist yet, so also handle via DOMContentLoaded
+    })();
 
     /* ── Init ────────────────────────────────────────────────────── */
     document.addEventListener('DOMContentLoaded', function () {

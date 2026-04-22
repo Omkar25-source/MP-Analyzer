@@ -235,7 +235,6 @@ function fireUnreadNotifications() {
         setTimeout(() => {
             const n = new Notification(`StudySync — ${alert.title}`, {
                 body : alert.desc || 'You have an unread reminder.',
-                icon : '../../Assets/img/icon.png', // graceful fallback if missing
                 tag  : `studysync-alert-${alert.id}`,
             });
             n.onclick = function () {

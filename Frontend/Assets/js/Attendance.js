@@ -274,8 +274,16 @@ function handleGlobalClicks(e) {
         const id  = parseInt(row?.dataset.recordId);
         if (!isNaN(id) && confirm('Delete this record?')) {
             if (useBackend()) {
-                // Optimistic UI remove — backend delete endpoint can be added later
-                allRecords = allRecords.filter(r => r.id !== id);
+                Api.deleteAttendance(id)
+                    .then(() => {
+                        allRecords = allRecords.filter(r => r.id !== id);
+                        renderAttendance();
+                        showToast('Attendance deleted');
+                    })
+                    .catch(err => {
+                        showToast(err.message || 'Failed to delete attendance', true);
+                    });
+                return;
             } else {
                 Store.deleteAttendanceRecord(id);
                 loadAttendanceFromStore();

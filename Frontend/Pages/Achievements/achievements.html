@@ -1,13 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StudySync - Achievements</title>
-    <meta name="description" content="Your StudySync achievement badges — milestones earned through consistent study habits.">
+    <meta name="description" content="Your StudySync achievement badges - milestones earned through consistent study habits.">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@0.263.1/dist/umd/lucide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.1/dist/umd/lucide.min.js"></script>
     <link rel="stylesheet" href="../../Assets/css/style.css">
 
     <style>
@@ -222,13 +222,13 @@
 <script src="../../Assets/js/api.js"></script>
 
 <script>
-/* ── Achievement definitions ──────────────────────────────────────
+/* -- Achievement definitions --------------------------------------
    Each badge has:
      id, emoji, name, desc, category
-     check(stats) → { earned: bool, progress: number (0-1), label: string }
-───────────────────────────────────────────────────────────────── */
+    check(stats) -> { earned: bool, progress: number (0-1), label: string }
+----------------------------------------------------------------- */
 const BADGES = [
-    // ── Study ─────────────────────────────────────────────────── //
+    // -- Study --------------------------------------------------- //
     {
         id: 'first_session', emoji: '📖', name: 'First Step', category: 'study',
         desc: 'Log your very first study session.',
@@ -265,7 +265,7 @@ const BADGES = [
         check: s => ({ earned: s.pomodoros >= 10, progress: Math.min(1, s.pomodoros / 10), label: `${s.pomodoros}/10 pomodoros` }),
     },
 
-    // ── Consistency ───────────────────────────────────────────── //
+    // -- Consistency --------------------------------------------- //
     {
         id: 'streak_3', emoji: '🌟', name: 'On Fire', category: 'consistency',
         desc: 'Maintain a 3-day study streak.',
@@ -287,7 +287,7 @@ const BADGES = [
         check: s => ({ earned: s.streak >= 21, progress: Math.min(1, s.streak / 21), label: `${s.streak}/21 days` }),
     },
 
-    // ── Goals ─────────────────────────────────────────────────── //
+    // -- Goals --------------------------------------------------- //
     {
         id: 'first_goal', emoji: '🎯', name: 'Goal Setter', category: 'goals',
         desc: 'Create your first goal.',
@@ -304,7 +304,7 @@ const BADGES = [
         check: s => ({ earned: s.completedGoals >= 5, progress: Math.min(1, s.completedGoals / 5), label: `${s.completedGoals}/5 goals` }),
     },
 
-    // ── Attendance ────────────────────────────────────────────── //
+    // -- Attendance ---------------------------------------------- //
     {
         id: 'first_att', emoji: '📅', name: 'Present!', category: 'attendance',
         desc: 'Log your first attendance record.',
@@ -312,16 +312,16 @@ const BADGES = [
     },
     {
         id: 'att_75', emoji: '✅', name: 'Reliable', category: 'attendance',
-        desc: 'Maintain ≥75% overall attendance.',
+        desc: 'Maintain >=75% overall attendance.',
         check: s => ({ earned: s.attPct >= 75, progress: Math.min(1, s.attPct / 75), label: `${s.attPct}% / 75%` }),
     },
     {
         id: 'att_90', emoji: '🌟', name: 'Attendance Champion', category: 'attendance',
-        desc: 'Maintain ≥90% overall attendance.',
+        desc: 'Maintain >=90% overall attendance.',
         check: s => ({ earned: s.attPct >= 90, progress: Math.min(1, s.attPct / 90), label: `${s.attPct}% / 90%` }),
     },
 
-    // ── Tasks ──────────────────────────────────────────────────── //
+    // -- Tasks ---------------------------------------------------- //
     {
         id: 'first_task', emoji: '📝', name: 'Planner', category: 'tasks',
         desc: 'Create your first task.',
@@ -339,7 +339,7 @@ const BADGES = [
     },
 ];
 
-/* ── Compute stats snapshot ───────────────────────────────────────── */
+/* -- Compute stats snapshot ----------------------------------------- */
 function computeStats() {
     const logs  = Store.getStudyLogs();
     const att   = Store.getAttendance();
@@ -366,7 +366,7 @@ function computeStats() {
     };
 }
 
-/* ── Render ───────────────────────────────────────────────────────── */
+/* -- Render --------------------------------------------------------- */
 let currentCat = 'all';
 
 function renderBadges() {
@@ -422,7 +422,7 @@ function renderBadges() {
     }).join('');
 }
 
-/* ── Category tabs ────────────────────────────────────────────────── */
+/* -- Category tabs -------------------------------------------------- */
 document.addEventListener('DOMContentLoaded', function () {
     renderIcons();
     Store.hydrateSidebar();
@@ -446,3 +446,5 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 </body>
 </html>
+
+
